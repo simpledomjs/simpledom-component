@@ -9,11 +9,11 @@
   "license": "Apache-2.0",
   "main": "dist/simpledom-component.js",
   "scripts": {
-    "clean": "del dist && del lib",
+    "clean": "del dist && del docs",
     "build": "npm run compile && npm run doc && npm run distribute",
     "compile": "webpack -p --colors",
     "doc": "esdoc -c ./esdoc.json",
-    "distribute": "ncp showroom dist && ncp esdoc dist/esdoc && echo $npm_package_version > dist/version.txt",
+    "distribute": "mkdir docs && ncp dist/simpledom-component.js docs && ncp showroom docs && ncp esdoc docs/esdoc && echo $npm_package_version > docs/version.txt",
     "deploy": "ncp dist /documentation",
     "start": "webpack-dev-server -d --colors --hot --inline --progress --content-base showroom/"
   },
