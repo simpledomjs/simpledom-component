@@ -13,7 +13,7 @@
     "build": "npm run compile && npm run doc && npm run distribute",
     "compile": "webpack -p --colors",
     "doc": "esdoc -c ./esdoc.json",
-    "distribute": "mkdir docs && ncp dist/simpledom-component.js docs && ncp showroom docs && ncp esdoc docs/esdoc && echo $npm_package_version > docs/version.txt",
+    "distribute": "mkdir docs && ncp dist docs && ncp showroom docs && ncp esdoc docs/esdoc && echo $npm_package_version > docs/version.txt",
     "deploy": "ncp dist /documentation",
     "start": "webpack-dev-server -d --colors --hot --inline --progress --content-base showroom/"
   },
