@@ -1,0 +1,28 @@
+[
+  {
+    "id": "helloWorld",
+    "title": "Very simple example",
+    "description": "This is the smallest example"
+  },
+  {
+    "id": "helloWorldComponent",
+    "title": "First component",
+    "description": "Let's try our first component"
+  },
+  {
+    "id": "composingComponents",
+    "title": "Composing components",
+    "description": "Let's try to use components in component"
+  },
+  {
+    "id": "clock",
+    "title": "A very simple clock",
+    "description": "Let's try to use events to update a component"
+  },
+  {
+    "id": "counter",
+    "title": "A simple counter with +1 and -1",
+    "description": "Let's try to use store and events to update a component with a persistant state"
+  }
+
+]

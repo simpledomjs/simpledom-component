@@ -1,0 +1,50 @@
+{
+  "name": "simpledom-component",
+  "version": "0.0.1",
+  "description": "Librairie orientée composant s'appuyant sur SimpleDom.js",
+  "author": {
+    "name": "Yan Bonnel",
+    "email": "ybonnel@gmail.com"
+  },
+  "license": "Apache-2.0",
+  "main": "dist/simpledom-component.js",
+  "scripts": {
+    "clean": "del dist && del lib",
+    "build": "npm run compile && npm run doc && npm run distribute",
+    "compile": "webpack -p --colors",
+    "doc": "esdoc -c ./esdoc.json",
+    "distribute": "ncp showroom dist && ncp esdoc dist/esdoc && echo $npm_package_version > dist/version.txt",
+    "deploy": "ncp dist /documentation",
+    "start": "webpack-dev-server -d --colors --hot --inline --progress --content-base showroom/"
+  },
+  "devDependencies": {
+    "array.prototype.find": "2.0.0",
+    "babel": "6.5.2",
+    "babel-cli": "6.16.0",
+    "babel-core": "6.17.0",
+    "babel-loader": "6.2.5",
+    "babel-plugin-add-module-exports": "0.2.1",
+    "babel-plugin-transform-class-properties": "6.19.0",
+    "babel-polyfill": "6.16.0",
+    "babel-preset-es2015": "6.16.0",
+    "babel-preset-react": "6.16.0",
+    "babel-preset-stage-0": "6.16.0",
+    "del-cli": "0.2.0",
+    "esdoc": "0.4.8",
+    "esdoc-es7-plugin": "0.0.3",
+    "esdoc-importpath-plugin": "0.0.1",
+    "file-loader": "0.9.0",
+    "less": "2.7.1",
+    "less-loader": "2.2.3",
+    "ncp": "2.0.0",
+    "node-libs-browser": "1.0.0",
+    "requirejs": "2.3.2",
+    "style-loader": "0.13.1",
+    "url-loader": "0.5.7",
+    "webpack": "1.13.2",
+    "webpack-dev-server": "1.16.2"
+  },
+  "dependencies": {
+    "simpledom.js": "1.0.1"
+  }
+}

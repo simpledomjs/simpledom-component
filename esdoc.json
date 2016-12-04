@@ -1,0 +1,25 @@
+{
+  "source": "./src",
+  "destination": "./esdoc",
+  "title": "SimpleDom-component",
+  "index": "./DOC.md",
+  "packageName": "test",
+  "excludes": ["util\\.js", "converter\\.js"],
+  "plugins": [
+    {
+      "name": "esdoc-importpath-plugin",
+      "option": {
+
+        "replaces": [
+          {
+            "from": "^.*",
+            "to": "dist/simpledom-component.js"
+          }
+        ]
+      }
+    },
+    {
+      "name": "esdoc-es7-plugin"
+    }
+  ]
+}
