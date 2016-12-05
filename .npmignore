@@ -26,3 +26,11 @@ build/Release
 # https://docs.npmjs.com/misc/faq#should-i-check-my-node-modules-folder-into-git
 node_modules
 .idea
+docs
+esdoc
+showroom
+yarn.lock
+release-it.json
+lint-es6.json
+esdoc.json
+DOC.md
