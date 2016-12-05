@@ -42,13 +42,13 @@
 </nav>
 
 <div class="content" data-ice="content"><div class="header-notice">
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {ConnectedComponent} from &apos;<span><a href="file/src/Component.js.html#lineNumber47">simpledom-component</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {ConnectedComponent} from &apos;<span><a href="file/src/Component.js.html#lineNumber95">simpledom-component</a></span>&apos;</code></pre></div>
   <span data-ice="access">public</span>
   <span data-ice="kind">class</span>
   
   
   
-  <span data-ice="source">| <span><a href="file/src/Component.js.html#lineNumber47">source</a></span></span>
+  <span data-ice="source">| <span><a href="file/src/Component.js.html#lineNumber95">source</a></span></span>
 </div>
 
 <div class="self-detail detail">
@@ -68,7 +68,21 @@
 
   
   
-  
+  <div class="description" data-ice="description"><p>Class for a component which react to store events.</p>
+<pre><code><code class="source-code prettyprint">  class Counter extends ConnectedComponent {
+     eventsToSubscribe() {
+         return [ &apos;UPDATE_COUNTER&apos; ];
+     }
+
+     render() {
+         return (
+             &lt;h1&gt;{this.state.counter}&lt;/h1&gt;
+         );
+     }
+  }
+
+  renderToDom(&apos;container&apos;, &lt;Counter /&gt;);</code>
+</code></pre></div>
 
   
 
@@ -97,13 +111,14 @@
     <td>
       <div>
         <p>
-           <span data-ice="name"><span><a href="class/src/Component.js~ConnectedComponent.html#instance-member-node">node</a></span></span><span data-ice="signature">: <span>*</span></span>
+           <span data-ice="name"><span><a href="class/src/Component.js~ConnectedComponent.html#instance-member-node">node</a></span></span><span data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/API/Node">Node</a></span></span>
         </p>
       </div>
       <div>
         
         
-        
+        <div data-ice="description"><p>Parent node of the component.</p>
+</div>
       </div>
     </td>
     <td>
@@ -122,13 +137,14 @@
     <td>
       <div>
         <p>
-           <span data-ice="name"><span><a href="class/src/Component.js~ConnectedComponent.html#instance-member-subscribersId">subscribersId</a></span></span><span data-ice="signature">: <span>*</span></span>
+           <span data-ice="name"><span><a href="class/src/Component.js~ConnectedComponent.html#instance-member-subscribersId">subscribersId</a></span></span><span data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span></span>
         </p>
       </div>
       <div>
         
         
-        
+        <div data-ice="description"><p>Do not touch :)</p>
+</div>
       </div>
     </td>
     <td>
@@ -154,13 +170,14 @@
     <td>
       <div>
         <p>
-           <span data-ice="name"><span><a href="class/src/Component.js~ConnectedComponent.html#instance-method-eventsToSubscribe">eventsToSubscribe</a></span></span><span data-ice="signature">(): <span>*</span></span>
+           <span data-ice="name"><span><a href="class/src/Component.js~ConnectedComponent.html#instance-method-eventsToSubscribe">eventsToSubscribe</a></span></span><span data-ice="signature">(): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span></span>
         </p>
       </div>
       <div>
         
         
-        
+        <div data-ice="description"><p>Method to implement to react when an event is send to <span><a href="class/src/Store.js~Store.html">Store</a></span></p>
+</div>
       </div>
     </td>
     <td>
@@ -179,13 +196,14 @@
     <td>
       <div>
         <p>
-           <span data-ice="name"><span><a href="class/src/Component.js~ConnectedComponent.html#instance-method-nodeRefHandler">nodeRefHandler</a></span></span><span data-ice="signature">(node: <span>*</span>)</span>
+           <span data-ice="name"><span><a href="class/src/Component.js~ConnectedComponent.html#instance-method-nodeRefHandler">nodeRefHandler</a></span></span><span data-ice="signature">(node: <span><a href="https://developer.mozilla.org/en-US/docs/Web/API/Node">Node</a></span>)</span>
         </p>
       </div>
       <div>
         
         
-        
+        <div data-ice="description"><p>Do not touch :)</p>
+</div>
       </div>
     </td>
     <td>
@@ -204,13 +222,15 @@
     <td>
       <div>
         <p>
-           <span data-ice="name"><span><a href="class/src/Component.js~ConnectedComponent.html#instance-method-reactToChangeState">reactToChangeState</a></span></span><span data-ice="signature">(event: <span>*</span>, state: <span>*</span>)</span>
+           <span data-ice="name"><span><a href="class/src/Component.js~ConnectedComponent.html#instance-method-reactToChangeState">reactToChangeState</a></span></span><span data-ice="signature">(event: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, state: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>)</span>
         </p>
       </div>
       <div>
         
         
-        
+        <div data-ice="description"><p>Internally method which is called when an event of <span><a href="class/src/Component.js~ConnectedComponent.html#instance-method-eventsToSubscribe">eventsToSubscribe</a></span>
+You can override the method if you want a specific</p>
+</div>
       </div>
     </td>
     <td>
@@ -229,13 +249,14 @@
     <td>
       <div>
         <p>
-           <span data-ice="name"><span><a href="class/src/Component.js~ConnectedComponent.html#instance-method-renderComponent">renderComponent</a></span></span><span data-ice="signature">(): <span>*</span></span>
+           <span data-ice="name"><span><a href="class/src/Component.js~ConnectedComponent.html#instance-method-renderComponent">renderComponent</a></span></span><span data-ice="signature">(): <span><a href="class/src/Component.js~Component.html">Component</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></span>
         </p>
       </div>
       <div>
         
         
-        
+        <div data-ice="description"><p>Method use internally to render a component.</p>
+</div>
       </div>
     </td>
     <td>
@@ -262,13 +283,14 @@
     <td>
       <div>
         <p>
-           <span data-ice="name"><span><a href="class/src/Component.js~Component.html#instance-get-state">state</a></span></span><span data-ice="signature">: <span>*</span></span>
+           <span data-ice="name"><span><a href="class/src/Component.js~Component.html#instance-get-state">state</a></span></span><span data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></span>
         </p>
       </div>
       <div>
         
         
-        
+        <div data-ice="description"><p>The state of the current store</p>
+</div>
       </div>
     </td>
     <td>
@@ -287,13 +309,14 @@
     <td>
       <div>
         <p>
-           <span data-ice="name"><span><a href="class/src/Component.js~Component.html#instance-member-props">props</a></span></span><span data-ice="signature">: <span>*</span></span>
+           <span data-ice="name"><span><a href="class/src/Component.js~Component.html#instance-member-props">props</a></span></span><span data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></span>
         </p>
       </div>
       <div>
         
         
-        
+        <div data-ice="description"><p>The props  (attributes pass to dom node + children).</p>
+</div>
       </div>
     </td>
     <td>
@@ -312,13 +335,40 @@
     <td>
       <div>
         <p>
-           <span data-ice="name"><span><a href="class/src/Component.js~Component.html#instance-member-store">store</a></span></span><span data-ice="signature">: <span>*</span></span>
+           <span data-ice="name"><span><a href="class/src/Component.js~Component.html#instance-member-store">store</a></span></span><span data-ice="signature">: <span><a href="class/src/Store.js~Store.html">Store</a></span></span>
         </p>
       </div>
       <div>
         
         
+        <div data-ice="description"><p>The store share between all components.</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      <span class="abstract" data-ice="abstract">abstract</span>
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+           <span data-ice="name"><span><a href="class/src/Component.js~Component.html#instance-method-render">render</a></span></span><span data-ice="signature">(): <span><a href="class/src/Component.js~Component.html">Component</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></span>
+        </p>
+      </div>
+      <div>
         
+        
+        <div data-ice="description"><p>Method to implement to render something.</p>
+</div>
       </div>
     </td>
     <td>
@@ -337,38 +387,14 @@
     <td>
       <div>
         <p>
-           <span data-ice="name"><span><a href="class/src/Component.js~Component.html#instance-method-render">render</a></span></span><span data-ice="signature">(): <span>*</span></span>
+           <span data-ice="name"><span><a href="class/src/Component.js~Component.html#instance-method-renderComponent">renderComponent</a></span></span><span data-ice="signature">(): <span><a href="class/src/Component.js~Component.html">Component</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></span>
         </p>
       </div>
       <div>
         
         
-        
-      </div>
-    </td>
-    <td>
-      
-      
-    </td>
-  </tr>
-<tr data-ice="target">
-    <td>
-      <span class="access" data-ice="access">public</span>
-      
-      
-      
-      <span class="override" data-ice="override"></span>
-    </td>
-    <td>
-      <div>
-        <p>
-           <span data-ice="name"><span><a href="class/src/Component.js~Component.html#instance-method-renderComponent">renderComponent</a></span></span><span data-ice="signature">(): <span>*</span></span>
-        </p>
-      </div>
-      <div>
-        
-        
-        
+        <div data-ice="description"><p>Method use internally to render a component.</p>
+</div>
       </div>
     </td>
     <td>
@@ -392,18 +418,19 @@
     
     
     
-    <span data-ice="name">node</span><span data-ice="signature">: <span>*</span></span>
+    <span data-ice="name">node</span><span data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/API/Node">Node</a></span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/Component.js.html#lineNumber51">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/Component.js.html#lineNumber106">source</a></span></span>
     </span>
   </h3>
 
   
   
   
-  
+  <div data-ice="description"><p>Parent node of the component.</p>
+</div>
 
   
 
@@ -432,18 +459,19 @@
     
     
     
-    <span data-ice="name">subscribersId</span><span data-ice="signature">: <span>*</span></span>
+    <span data-ice="name">subscribersId</span><span data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/Component.js.html#lineNumber52">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/Component.js.html#lineNumber111">source</a></span></span>
     </span>
   </h3>
 
   
   
   
-  
+  <div data-ice="description"><p>Do not touch :)</p>
+</div>
 
   
 
@@ -475,18 +503,19 @@
     
     
     
-    <span data-ice="name">eventsToSubscribe</span><span data-ice="signature">(): <span>*</span></span>
+    <span data-ice="name">eventsToSubscribe</span><span data-ice="signature">(): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/Component.js.html#lineNumber76">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/Component.js.html#lineNumber146">source</a></span></span>
     </span>
   </h3>
 
   
   
   
-  
+  <div data-ice="description"><p>Method to implement to react when an event is send to <span><a href="class/src/Store.js~Store.html">Store</a></span></p>
+</div>
 
   
 
@@ -497,8 +526,9 @@
     <h4>Return:</h4>
     <table>
       <tr>
-        <td class="return-type" data-ice="returnType"><span>*</span></td>
-        
+        <td class="return-type" data-ice="returnType"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span></td>
+        <td class="return-desc" data-ice="returnDescription"><p>array of string events to react.</p>
+</td>
       </tr>
     </table>
     <div data-ice="returnProperties">
@@ -525,18 +555,19 @@
     
     
     
-    <span data-ice="name">nodeRefHandler</span><span data-ice="signature">(node: <span>*</span>)</span>
+    <span data-ice="name">nodeRefHandler</span><span data-ice="signature">(node: <span><a href="https://developer.mozilla.org/en-US/docs/Web/API/Node">Node</a></span>)</span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/Component.js.html#lineNumber50">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/Component.js.html#lineNumber101">source</a></span></span>
     </span>
   </h3>
 
   
   
   
-  
+  <div data-ice="description"><p>Do not touch :)</p>
+</div>
 
   
 
@@ -550,9 +581,10 @@
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" data-depth="0">node</td>
-      <td data-ice="type"><span>*</span></td>
+      <td data-ice="type"><span><a href="https://developer.mozilla.org/en-US/docs/Web/API/Node">Node</a></span></td>
       <td data-ice="appendix"></td>
-      <td data-ice="description"></td>
+      <td data-ice="description"><p>parent node of the component.</p>
+</td>
     </tr>
 </tbody>
   </table>
@@ -581,18 +613,20 @@
     
     
     
-    <span data-ice="name">reactToChangeState</span><span data-ice="signature">(event: <span>*</span>, state: <span>*</span>)</span>
+    <span data-ice="name">reactToChangeState</span><span data-ice="signature">(event: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, state: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>)</span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/Component.js.html#lineNumber70">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/Component.js.html#lineNumber136">source</a></span></span>
     </span>
   </h3>
 
   
   
   
-  
+  <div data-ice="description"><p>Internally method which is called when an event of <span><a href="class/src/Component.js~ConnectedComponent.html#instance-method-eventsToSubscribe">eventsToSubscribe</a></span>
+You can override the method if you want a specific</p>
+</div>
 
   
 
@@ -606,15 +640,17 @@
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" data-depth="0">event</td>
-      <td data-ice="type"><span>*</span></td>
+      <td data-ice="type"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></td>
       <td data-ice="appendix"></td>
-      <td data-ice="description"></td>
+      <td data-ice="description"><p>event received in the store.</p>
+</td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" data-depth="0">state</td>
-      <td data-ice="type"><span>*</span></td>
+      <td data-ice="type"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></td>
       <td data-ice="appendix"></td>
-      <td data-ice="description"></td>
+      <td data-ice="description"><p>the new state.</p>
+</td>
     </tr>
 </tbody>
   </table>
@@ -643,18 +679,19 @@
     
     
     
-    <span data-ice="name">renderComponent</span><span data-ice="signature">(): <span>*</span></span>
+    <span data-ice="name">renderComponent</span><span data-ice="signature">(): <span><a href="class/src/Component.js~Component.html">Component</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/Component.js.html#lineNumber80">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/Component.js.html#lineNumber154">source</a></span></span>
     </span>
   </h3>
 
   
   
   
-  
+  <div data-ice="description"><p>Method use internally to render a component.</p>
+</div>
 
   <div data-ice="override"><h4>Override:</h4><span><a href="class/src/Component.js~Component.html#instance-method-renderComponent">Component#renderComponent</a></span></div>
 
@@ -665,8 +702,9 @@
     <h4>Return:</h4>
     <table>
       <tr>
-        <td class="return-type" data-ice="returnType"><span>*</span></td>
-        
+        <td class="return-type" data-ice="returnType"><span><a href="class/src/Component.js~Component.html">Component</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></td>
+        <td class="return-desc" data-ice="returnDescription"><p>This return a component or result of SimpleDom.el.</p>
+</td>
       </tr>
     </table>
     <div data-ice="returnProperties">

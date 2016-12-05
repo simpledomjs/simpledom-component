@@ -42,8 +42,31 @@
 </nav>
 
 <div class="content" data-ice="content"><div data-ice="index" class="github-markdown"><h1 id="simpledom-component">simpledom-component</h1>
-<p>Simpledom-component est une librairie orient&#xE9;e composant s&apos;appuyant sur SimpleDom.js.</p>
-</div>
+<p>Simpledom-component is just an other javascript component framework.</p>
+<pre><code><code class="source-code prettyprint">npm install --save simpledom-component</code>
+</code></pre><pre><code><code class="source-code prettyprint">import * as SimpleDom from &apos;simpledom-component&apos;;
+
+class Clock extends SimpleDom.ConnectedComponent {
+    eventsToSubscribe() {
+        return [&apos;UPDATE_CLOCK&apos;];
+    }
+
+    render() {
+        return (
+            &lt;div&gt;
+                &lt;h1&gt;Hello, world!&lt;/h1&gt;
+                &lt;h2&gt;It is {new Date().toLocaleTimeString()}.&lt;/h2&gt;
+            &lt;/div&gt;
+        );
+    }
+
+}
+
+const store = new SimpleDom.Store();
+SimpleDom.renderToDom(&apos;clock&apos;, &lt;Clock /&gt;, store);
+
+setInterval(() =&gt; store.sendState(&apos;UPDATE_CLOCK&apos;), 1000);</code>
+</code></pre></div>
 </div>
 
 <footer class="footer">
