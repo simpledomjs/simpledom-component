@@ -450,12 +450,6 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
-    "src/store.js~store#sendstate",
-    "class/src/Store.js~Store.html#instance-method-sendState",
-    "src/Store.js~Store#sendState",
-    "method"
-  ],
-  [
     "src/store.js~store#state",
     "class/src/Store.js~Store.html#instance-member-state",
     "src/Store.js~Store#state",
@@ -477,6 +471,12 @@ window.esdocSearchIndex = [
     "src/store.js~store#unsubsribe",
     "class/src/Store.js~Store.html#instance-method-unsubsribe",
     "src/Store.js~Store#unsubsribe",
+    "method"
+  ],
+  [
+    "src/store.js~store#updatestate",
+    "class/src/Store.js~Store.html#instance-method-updateState",
+    "src/Store.js~Store#updateState",
     "method"
   ],
   [

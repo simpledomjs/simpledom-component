@@ -9,4 +9,4 @@ export function convertToSimpleDom(component, store) {
         simpleDomEl.children = simpleDomEl.children.map(child => convertToSimpleDom(child, store))
     }
     return simpleDomEl;
-}y
+}

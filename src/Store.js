@@ -1,4 +1,6 @@
 
+import {flatten} from './util';
+
 let generatedId = 1;
 
 function generateId() {
@@ -28,14 +30,17 @@ export class Store {
 
     /**
      * Method to call to change the state.
-     * @param {string} event event to the origin of the state change.
      * @param {object} newState the new state (you can put only attributes changed).
+     * @param {...string} events events to the origin of the state change.
      */
-    sendState(event, newState) {
+    updateState(newState, ...events) {
         this.state = {...this.state, ...newState};
-        Object.keys(this.subscribers[event] || {}).map(id => this.subscribers[event][id])
-            .forEach(callback => callback(event, this.state));
-
+        flatten(
+            events.map(event =>
+                Object.keys(this.subscribers[event] || {})
+                    .map(id => this.subscribers[event][id])
+            )
+        ).forEach(callback => callback(event, this.state));
     }
 
     /**

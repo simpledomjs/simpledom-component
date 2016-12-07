@@ -65,7 +65,7 @@ class Clock extends SimpleDom.ConnectedComponent {
 const store = new SimpleDom.Store();
 SimpleDom.renderToDom(&apos;clock&apos;, &lt;Clock /&gt;, store);
 
-setInterval(() =&gt; store.sendState(&apos;UPDATE_CLOCK&apos;), 1000);</code>
+setInterval(() =&gt; store.updateState({}, &apos;UPDATE_CLOCK&apos;), 1000);</code>
 </code></pre></div>
 </div>
 

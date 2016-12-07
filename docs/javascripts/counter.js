@@ -16,10 +16,10 @@ class Counter extends SimpleDom.ConnectedComponent {
 
 class CounterButtons extends SimpleDom.Component {
     increment() {
-        this.store.sendState('UPDATE_COUNTER', {counter: this.state.counter + 1});
+        this.store.updateState({counter: this.state.counter + 1}, 'UPDATE_COUNTER');
     }
     decrement() {
-        this.store.sendState('UPDATE_COUNTER', {counter: this.state.counter - 1});
+        this.store.updateState({counter: this.state.counter - 1}, 'UPDATE_COUNTER');
     }
 
     render() {

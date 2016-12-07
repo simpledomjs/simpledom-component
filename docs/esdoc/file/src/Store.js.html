@@ -43,6 +43,8 @@
 
 <div class="content" data-ice="content"><h1 data-ice="title">src/Store.js</h1>
 <pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">
+import {flatten} from &apos;./util&apos;;
+
 let generatedId = 1;
 
 function generateId() {
@@ -72,13 +74,17 @@ export class Store {
 
     /**
      * Method to call to change the state.
-     * @param {string} event event to the origin of the state change.
      * @param {object} newState the new state (you can put only attributes changed).
+     * @param {...string} events events to the origin of the state change.
      */
-    sendState(event, newState) {
+    updateState(newState, ...events) {
         this.state = {...this.state, ...newState};
-        Object.keys(this.subscribers[event] || {}).map(id =&gt; this.subscribers[event][id])
-            .forEach(callback =&gt; callback(event, this.state));
+        flatten(
+            events.map(event =&gt;
+                Object.keys(this.subscribers[event] || {})
+                    .map(id =&gt; this.subscribers[event][id])
+            )
+        ).forEach(callback =&gt; callback(event, this.state));
 
     }
 
