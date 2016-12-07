@@ -2,7 +2,7 @@
 
 export function convertToSimpleDom(component, store) {
     let simpleDomEl = component;
-    while (simpleDomEl && simpleDomEl.isComponent) {
+    while (simpleDomEl !== null && simpleDomEl !== undefined && simpleDomEl.isComponent) {
         simpleDomEl = new simpleDomEl.componentClass({...simpleDomEl.props}, store).renderComponent();
     }
     if (simpleDomEl && simpleDomEl.children) {
