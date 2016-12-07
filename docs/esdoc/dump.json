@@ -346,7 +346,7 @@
     "access": null,
     "description": null,
     "lineNumber": 1,
-    "content": "\nimport {flatten} from './util';\n\nlet generatedId = 1;\n\nfunction generateId() {\n    return generatedId++;\n}\n\n/**\n * A simple Store which receive all state changes with an event (string).\n */\nexport class Store {\n    /**\n     * The constructor.\n     * @param {object} initialeState the initial state.\n     */\n    constructor(initialeState) {\n        /**\n         * The state of store.\n         * @type {object}\n         */\n        this.state = initialeState;\n        /**\n         * Don't touch :)\n         * @type {Object}\n         */\n        this.subscribers = {};\n    }\n\n    /**\n     * Method to call to change the state.\n     * @param {object} newState the new state (you can put only attributes changed).\n     * @param {...string} events events to the origin of the state change.\n     */\n    updateState(newState, ...events) {\n        this.state = {...this.state, ...newState};\n        flatten(\n            events.map(event =>\n                Object.keys(this.subscribers[event] || {})\n                    .map(id => this.subscribers[event][id])\n            )\n        ).forEach(callback => callback(event, this.state));\n\n    }\n\n    /**\n     * Method to call to subscribe to an event.\n     * @param {string} event event to subscribe.\n     * @param {function(event: string, state: object)} callback the callback called when receive the event.\n     * @return {number} the id to put in param of {@link unsubscribe} to unsubscribe.\n     */\n    subscribe(event, callback = state => {}) {\n        if (!this.subscribers[event]) {\n            this.subscribers[event] = {};\n        }\n        const id = generateId();\n        this.subscribers[event][id] = callback;\n        return id;\n    }\n\n    /**\n     * Unsubscribe.\n     * @param {number} id id received at {@link subscribe}\n     */\n    unsubsribe(id) {\n        for (let event of Object.keys(this.subscribers)) {\n            if (this.subscribers[event][id]) {\n                delete this.subscribers[event][id];\n            }\n        }\n    }\n}\n"
+    "content": "\nimport {flatten} from './util';\n\nlet generatedId = 1;\n\nfunction generateId() {\n    return generatedId++;\n}\n\n/**\n * A simple Store which receive all state changes with an event (string).\n */\nexport class Store {\n    /**\n     * The constructor.\n     * @param {object} initialeState the initial state.\n     */\n    constructor(initialeState) {\n        /**\n         * The state of store.\n         * @type {object}\n         */\n        this.state = initialeState;\n        /**\n         * Don't touch :)\n         * @type {Object}\n         */\n        this.subscribers = {};\n    }\n\n    /**\n     * Method to call to change the state.\n     * @param {object} newState the new state (you can put only attributes changed).\n     * @param {...string} events events to the origin of the state change.\n     */\n    updateState(newState, ...events) {\n        this.state = {...this.state, ...newState};\n        flatten(\n            events.map(event =>\n                Object.keys(this.subscribers[event] || {})\n                    .map(id => this.subscribers[event][id])\n            )\n        ).forEach(callback => callback(event, this.state));\n    }\n\n    /**\n     * Method to call to subscribe to an event.\n     * @param {string} event event to subscribe.\n     * @param {function(event: string, state: object)} callback the callback called when receive the event.\n     * @return {number} the id to put in param of {@link unsubscribe} to unsubscribe.\n     */\n    subscribe(event, callback = state => {}) {\n        if (!this.subscribers[event]) {\n            this.subscribers[event] = {};\n        }\n        const id = generateId();\n        this.subscribers[event][id] = callback;\n        return id;\n    }\n\n    /**\n     * Unsubscribe.\n     * @param {number} id id received at {@link subscribe}\n     */\n    unsubsribe(id) {\n        for (let event of Object.keys(this.subscribers)) {\n            if (this.subscribers[event][id]) {\n                delete this.subscribers[event][id];\n            }\n        }\n    }\n}\n"
   },
   {
     "__docId__": 16,
@@ -536,7 +536,7 @@
     "longname": "src/Store.js~Store#subscribe",
     "access": null,
     "description": "Method to call to subscribe to an event.",
-    "lineNumber": 53,
+    "lineNumber": 52,
     "params": [
       {
         "nullable": null,
@@ -579,7 +579,7 @@
     "longname": "src/Store.js~Store#unsubsribe",
     "access": null,
     "description": "Unsubscribe.",
-    "lineNumber": 66,
+    "lineNumber": 65,
     "params": [
       {
         "nullable": null,
