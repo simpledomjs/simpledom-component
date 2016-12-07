@@ -1,14 +1,11 @@
 
 
 export function convertToSimpleDom(component, store) {
-    if (component === undefined || component === null) {
-        return undefined;
-    }
     let simpleDomEl = component;
-    while (simpleDomEl.isComponent) {
+    while (simpleDomEl && simpleDomEl.isComponent) {
         simpleDomEl = new simpleDomEl.componentClass({...simpleDomEl.props}, store).renderComponent();
     }
-    if (simpleDomEl.children) {
+    if (simpleDomEl && simpleDomEl.children) {
         simpleDomEl.children = simpleDomEl.children.map(child => convertToSimpleDom(child, store))
     }
     return simpleDomEl;
