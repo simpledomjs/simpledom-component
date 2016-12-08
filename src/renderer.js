@@ -36,6 +36,5 @@ export function el(el, attrs, ...children) {
 export function renderToDom(container, component, store = new Store()) {
     let convertedElements = convertToSimpleDom(component, store);
     SimpleDom.renderTo(container, convertedElements.simpleDomEl);
-    console.log(convertedElements.componentList);
     convertedElements.componentList.forEach(component => component.componentDidMount());
 }
