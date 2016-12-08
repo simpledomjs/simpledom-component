@@ -96,6 +96,13 @@ export class Component {
     }
 
     /**
+     * Method called after rendered into DOM.
+     * @abstract
+     */
+    componentDidMount() {
+    }
+
+    /**
      * Method use internally to render a component.
      * @return {Component|Object} This return a component or result of SimpleDom.el.
      */
@@ -172,15 +179,28 @@ export class ConnectedComponent extends Component {
     }
 
     /**
+     * Return false to avoid call to render on an event.
+     */
+    mustRefresh() {
+        return true;
+    }
+
+    /**
      * Internally method which is called when an event of {@link eventsToSubscribe}
      * You can override the method if you want a specific
      * @param {string} event event received in the store.
      * @param {Object} state the new state.
      */
     reactToChangeState(event, state) {
+        if (!this.mustRefresh()) {
+            return;
+        }
+        let convertedElement = convertToSimpleDom(this.render(), this.store);
         SimpleDom.renderTo(this.node,
-            convertToSimpleDom(this.render(), this.store)
+            convertedElement.simpleDomEl
         );
+        convertedElement.componentList.forEach(component =&gt; component.componentDidMount());
+        this.componentDidMount();
     }
 
     /**

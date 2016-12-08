@@ -366,6 +366,12 @@ window.esdocSearchIndex = [
     "file"
   ],
   [
+    "src/component.js~component#componentdidmount",
+    "class/src/Component.js~Component.html#instance-method-componentDidMount",
+    "src/Component.js~Component#componentDidMount",
+    "method"
+  ],
+  [
     "src/component.js~component#constructor",
     "class/src/Component.js~Component.html#instance-constructor-constructor",
     "src/Component.js~Component#constructor",
@@ -405,6 +411,12 @@ window.esdocSearchIndex = [
     "src/component.js~connectedcomponent#eventstosubscribe",
     "class/src/Component.js~ConnectedComponent.html#instance-method-eventsToSubscribe",
     "src/Component.js~ConnectedComponent#eventsToSubscribe",
+    "method"
+  ],
+  [
+    "src/component.js~connectedcomponent#mustrefresh",
+    "class/src/Component.js~ConnectedComponent.html#instance-method-mustRefresh",
+    "src/Component.js~ConnectedComponent#mustRefresh",
     "method"
   ],
   [
