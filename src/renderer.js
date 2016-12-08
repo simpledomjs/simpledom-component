@@ -34,5 +34,8 @@ export function el(el, attrs, ...children) {
  * @param {Store} store the store
  */
 export function renderToDom(container, component, store = new Store()) {
-    SimpleDom.renderTo(container, convertToSimpleDom(component, store));
+    let convertedElements = convertToSimpleDom(component, store);
+    SimpleDom.renderTo(container, convertedElements.simpleDomEl);
+    console.log(convertedElements.componentList);
+    convertedElements.componentList.forEach(component => component.componentDidMount());
 }
