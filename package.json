@@ -46,6 +46,6 @@
     "webpack-dev-server": "1.16.2"
   },
   "dependencies": {
-    "simpledom.js": "1.0.1"
+    "simpledom.js": "1.1.1"
   }
 }

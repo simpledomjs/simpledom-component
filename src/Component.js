@@ -155,6 +155,9 @@ export class ConnectedComponent extends Component {
         SimpleDom.renderTo(this.node,
             convertedElement.simpleDomEl
         );
+
+        SimpleDom.updateAttrs(this.node, this.renderComponent());
+
         convertedElement.componentList.forEach(component => component.componentDidMount());
         this.componentDidMount();
     }
@@ -172,11 +175,20 @@ export class ConnectedComponent extends Component {
      * @return {Component|Object} This return a component or result of SimpleDom.el.
      */
     renderComponent() {
-        return (
-            <div ref={node => this.nodeRefHandler(node)}>
-                {this.render()}
-            </div>
-        );
+        const wrapper = this.wrapperNode();
+        wrapper.attrs.ref = node => this.nodeRefHandler(node);
+        wrapper.children = flatten([this.render()]);
+        return wrapper;
+    }
+
+    /**
+     * Node wrapping render
+     * Default is ```<div/```
+     * @abstract
+     * @return {Object} simpledom.el result.
+     */
+    wrapperNode() {
+        return <div/>;
     }
 
 }
