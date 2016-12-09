@@ -156,7 +156,7 @@ export class ConnectedComponent extends Component {
             convertedElement.simpleDomEl
         );
 
-        SimpleDom.updateAttrs(this.node, this.renderComponent());
+        SimpleDom.updateAttrs(this.node, this.wrapperNode());
 
         convertedElement.componentList.forEach(component => component.componentDidMount());
         this.componentDidMount();
