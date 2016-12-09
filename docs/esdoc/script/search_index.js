@@ -450,6 +450,12 @@ window.esdocSearchIndex = [
     "member"
   ],
   [
+    "src/component.js~connectedcomponent#wrappernode",
+    "class/src/Component.js~ConnectedComponent.html#instance-method-wrapperNode",
+    "src/Component.js~ConnectedComponent#wrapperNode",
+    "method"
+  ],
+  [
     "src/store.js",
     "file/src/Store.js.html",
     "src/Store.js",

@@ -1,6 +1,6 @@
 {
   "name": "simpledom-component",
-  "version": "0.4.6",
+  "version": "0.4.8",
   "description": "Librairie orientée composant s'appuyant sur SimpleDom.js",
   "author": {
     "name": "Yan Bonnel",
@@ -46,6 +46,6 @@
     "webpack-dev-server": "1.16.2"
   },
   "dependencies": {
-    "simpledom.js": "1.0.1"
+    "simpledom.js": "1.1.1"
   }
 }

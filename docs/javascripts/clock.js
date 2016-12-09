@@ -6,12 +6,14 @@ class Clock extends SimpleDom.ConnectedComponent {
     }
 
     render() {
-        return (
-            <div>
-                <h1>Hello, world!</h1>
+        return [
+                <h1>Hello, world!</h1>,
                 <h2>It is {new Date().toLocaleTimeString()}.</h2>
-            </div>
-        );
+        ];
+    }
+
+    wrapperNode() {
+        return <p style={{color: new Date().getSeconds()%2 ? 'red' : 'black'}}/>;
     }
 
 }
