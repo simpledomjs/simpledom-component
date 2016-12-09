@@ -159,9 +159,6 @@ export class ConnectedComponent extends Component {
         );
         oldNode.parentNode.replaceChild(this.node, oldNode);
 
-
-        SimpleDom.convertToNode(this.wrapperNode());
-
         convertedElement.componentList.forEach(component => component.componentDidMount());
         this.componentDidMount();
     }
