@@ -152,11 +152,15 @@ export class ConnectedComponent extends Component {
             return;
         }
         let convertedElement = convertToSimpleDom(this.render(), this.store);
+        const oldNode = this.node;
+        this.node = SimpleDom.convertToNode(this.wrapperNode());
         SimpleDom.renderTo(this.node,
             convertedElement.simpleDomEl
         );
+        oldNode.parentNode.replaceChild(this.node, oldNode);
 
-        SimpleDom.updateAttrs(this.node, this.wrapperNode());
+
+        SimpleDom.convertToNode(this.wrapperNode());
 
         convertedElement.componentList.forEach(component => component.componentDidMount());
         this.componentDidMount();
