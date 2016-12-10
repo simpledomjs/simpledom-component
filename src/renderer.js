@@ -37,4 +37,32 @@ export function renderToDom(container, component, store = new Store()) {
     let convertedElements = convertToSimpleDom(component, store);
     SimpleDom.renderTo(container, convertedElements.simpleDomEl);
     convertedElements.componentList.forEach(component => component.componentDidMount());
+
+
+    let rootNode = container;
+    if (typeof rootNode === 'string') {
+        rootNode = document.getElementById(container);
+    }
+
+    const mutationObserver = new MutationObserver(mutations => {
+        for (const removedNode of flatten(mutations.map(mutation => Array.from(mutation.removedNodes)))) {
+            if (removedNode.contains(rootNode)) {
+                mutationObserver.disconnect();
+                store.unsubscribeAll();
+            }
+
+            for (let index = store.componentsSubscribes.length - 1; index >= 0; index--) {
+                const component = store.componentsSubscribes[index];
+                if (component.component.node && removedNode.contains(component.component.node)) {
+                    component.subscribes.forEach(({event, id}) => store.unsubscribeByEventAndId(event, id));
+                    component.component.node = undefined;
+                    store.componentsSubscribes.splice(index, 1);
+                }
+            }
+        }
+    });
+
+
+    mutationObserver.observe(document.body, {childList: true, subtree: true});
+
 }

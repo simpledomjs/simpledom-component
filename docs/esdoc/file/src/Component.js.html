@@ -33,7 +33,6 @@
   <ul>
     
   <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/Component.js~Component.html">Component</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/Component.js~ConnectedComponent.html">ConnectedComponent</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/Store.js~Store.html">Store</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-el">el</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-renderToDom">renderToDom</a></span></span></li>
@@ -93,6 +92,63 @@ export class Component {
             .filter(name =&gt; name !== &apos;constructor&apos;)
             .filter(name =&gt; this[name] instanceof Function)
             .forEach(name =&gt; this[name] = this[name].bind(this));
+
+        for (const event of this.eventsToSubscribe()) {
+            this.store.subscribe(event, this.reactToChangeState.bind(this), this);
+        }
+    }
+
+
+    /**
+     * Do not touch :)
+     * @param {Node} node parent node of the component.
+     */
+    nodeRefHandler(node) {
+        /**
+         * Parent node of the component.
+         * @type {Node}
+         */
+        this.node = node;
+    }
+
+    /**
+     * Internally method which is called when an event of {@link eventsToSubscribe}
+     * You can override the method if you want a specific
+     * @param {string} event event received in the store.
+     * @param {Object} state the new state.
+     */
+    reactToChangeState(event, state) {
+        if (!this.mustRefresh() || !this.node) {
+            return;
+        }
+
+        let convertedElement = convertToSimpleDom(this.renderComponent(), this.store);
+        const oldNode = this.node;
+        if (convertedElement.simpleDomEl === undefined &amp;&amp; convertedElement.simpleDomEl === null) {
+            oldNode.parentNode.removeChild(oldNode);
+            return;
+        }
+        const newNode = SimpleDom.convertToNode(convertedElement.simpleDomEl);
+        oldNode.parentNode.replaceChild(newNode, oldNode);
+
+        convertedElement.componentList.forEach(component =&gt; component.componentDidMount());
+        this.componentDidMount();
+    }
+
+    /**
+     * Method to implement to react when an event is send to {@link Store}
+     * @return {Array} array of string events to react.
+     */
+    eventsToSubscribe() {
+        return [];
+    }
+
+
+    /**
+     * Return false to avoid call to render on an event.
+     */
+    mustRefresh() {
+        return true;
     }
 
     /**
@@ -107,7 +163,19 @@ export class Component {
      * @return {Component|Object} This return a component or result of SimpleDom.el.
      */
     renderComponent() {
-        return this.render();
+        const result = this.render();
+        if (this.eventsToSubscribe() &amp;&amp; this.eventsToSubscribe().length &gt; 0) {
+            if (result === undefined || result === null) {
+                return &lt;div ref={node =&gt; this.nodeRefHandler(node)} style={{width:0,height:0}}/&gt;;
+            }
+
+            let firstSimpleDomChild = result;
+            while (firstSimpleDomChild &amp;&amp; !firstSimpleDomChild.isElem) {
+                firstSimpleDomChild = firstSimpleDomChild.children &amp;&amp; firstSimpleDomChild.children[0];
+            }
+            firstSimpleDomChild.attrs.ref = node =&gt; this.nodeRefHandler(node);
+        }
+        return result;
     }
 
     /**
@@ -117,123 +185,6 @@ export class Component {
      */
     render() {
         return undefined;
-    }
-
-}
-
-/**
- * Class for a component which react to store events.
- *
- *
- * ```
- *   class Counter extends ConnectedComponent {
- *      eventsToSubscribe() {
- *          return [ &apos;UPDATE_COUNTER&apos; ];
- *      }
- *
- *      render() {
- *          return (
- *              &lt;h1&gt;{this.state.counter}&lt;/h1&gt;
- *          );
- *      }
- *   }
- *
- *   renderToDom(&apos;container&apos;, &lt;Counter /&gt;);
- * ```
- *
- * @extends {Component}
- */
-export class ConnectedComponent extends Component {
-
-    /**
-     * Do not touch :)
-     * @param {Node} node parent node of the component.
-     */
-    nodeRefHandler(node) {
-        /**
-         * Parent node of the component.
-         * @type {Node}
-         */
-        this.node = node;
-        /**
-         * Do not touch :)
-         * @type {Array}
-         */
-        this.subscribersId = [];
-        for (const event of this.eventsToSubscribe()) {
-            this.subscribersId.push(this.store.subscribe(event, this.reactToChangeState.bind(this)));
-        }
-
-
-        const mutationObserver = new MutationObserver(mutations =&gt; {
-            if (flatten(mutations.map(mutation =&gt; Array.from(mutation.removedNodes)))
-                .findIndex(removedNode =&gt; removedNode.contains(this.node)) !== -1) {
-                mutationObserver.disconnect();
-                for (const subscriberId of this.subscribersId) {
-                    this.store.unsubsribe(subscriberId);
-                }
-            }
-        });
-
-        mutationObserver.observe(document.body, {childList: true, subtree: true});
-    }
-
-    /**
-     * Return false to avoid call to render on an event.
-     */
-    mustRefresh() {
-        return true;
-    }
-
-    /**
-     * Internally method which is called when an event of {@link eventsToSubscribe}
-     * You can override the method if you want a specific
-     * @param {string} event event received in the store.
-     * @param {Object} state the new state.
-     */
-    reactToChangeState(event, state) {
-        if (!this.mustRefresh()) {
-            return;
-        }
-        let convertedElement = convertToSimpleDom(this.render(), this.store);
-        const oldNode = this.node;
-        this.node = SimpleDom.convertToNode(this.wrapperNode());
-        SimpleDom.renderTo(this.node,
-            convertedElement.simpleDomEl
-        );
-        oldNode.parentNode.replaceChild(this.node, oldNode);
-
-        convertedElement.componentList.forEach(component =&gt; component.componentDidMount());
-        this.componentDidMount();
-    }
-
-    /**
-     * Method to implement to react when an event is send to {@link Store}
-     * @return {Array} array of string events to react.
-     */
-    eventsToSubscribe() {
-        return [];
-    }
-
-    /**
-     * Method use internally to render a component.
-     * @return {Component|Object} This return a component or result of SimpleDom.el.
-     */
-    renderComponent() {
-        const wrapper = this.wrapperNode();
-        wrapper.attrs.ref = node =&gt; this.nodeRefHandler(node);
-        wrapper.children = flatten([this.render()]);
-        return wrapper;
-    }
-
-    /**
-     * Node wrapping render
-     * Default is ```&lt;div/```
-     * @abstract
-     * @return {Object} simpledom.el result.
-     */
-    wrapperNode() {
-        return &lt;div/&gt;;
     }
 
 }

@@ -5,7 +5,6 @@ import { el, renderToDom } from './renderer';
 
 exports.Component = Component;
 exports.Store = Store;
-exports.ConnectedComponent = ConnectedComponent;
 exports.el = el;
 exports.renderToDom = renderToDom;
 exports.renderTo = SimpleDom.renderTo;

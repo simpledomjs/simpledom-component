@@ -6,12 +6,6 @@ window.esdocSearchIndex = [
     "class"
   ],
   [
-    "simpledom-component~connectedcomponent",
-    "class/src/Component.js~ConnectedComponent.html",
-    "<span>ConnectedComponent</span> <span class=\"search-result-import-path\">simpledom-component</span>",
-    "class"
-  ],
-  [
     "simpledom-component~store",
     "class/src/Store.js~Store.html",
     "<span>Store</span> <span class=\"search-result-import-path\">simpledom-component</span>",
@@ -378,10 +372,40 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
+    "src/component.js~component#eventstosubscribe",
+    "class/src/Component.js~Component.html#instance-method-eventsToSubscribe",
+    "src/Component.js~Component#eventsToSubscribe",
+    "method"
+  ],
+  [
+    "src/component.js~component#mustrefresh",
+    "class/src/Component.js~Component.html#instance-method-mustRefresh",
+    "src/Component.js~Component#mustRefresh",
+    "method"
+  ],
+  [
+    "src/component.js~component#node",
+    "class/src/Component.js~Component.html#instance-member-node",
+    "src/Component.js~Component#node",
+    "member"
+  ],
+  [
+    "src/component.js~component#noderefhandler",
+    "class/src/Component.js~Component.html#instance-method-nodeRefHandler",
+    "src/Component.js~Component#nodeRefHandler",
+    "method"
+  ],
+  [
     "src/component.js~component#props",
     "class/src/Component.js~Component.html#instance-member-props",
     "src/Component.js~Component#props",
     "member"
+  ],
+  [
+    "src/component.js~component#reacttochangestate",
+    "class/src/Component.js~Component.html#instance-method-reactToChangeState",
+    "src/Component.js~Component#reactToChangeState",
+    "method"
   ],
   [
     "src/component.js~component#render",
@@ -408,58 +432,16 @@ window.esdocSearchIndex = [
     "member"
   ],
   [
-    "src/component.js~connectedcomponent#eventstosubscribe",
-    "class/src/Component.js~ConnectedComponent.html#instance-method-eventsToSubscribe",
-    "src/Component.js~ConnectedComponent#eventsToSubscribe",
-    "method"
-  ],
-  [
-    "src/component.js~connectedcomponent#mustrefresh",
-    "class/src/Component.js~ConnectedComponent.html#instance-method-mustRefresh",
-    "src/Component.js~ConnectedComponent#mustRefresh",
-    "method"
-  ],
-  [
-    "src/component.js~connectedcomponent#node",
-    "class/src/Component.js~ConnectedComponent.html#instance-member-node",
-    "src/Component.js~ConnectedComponent#node",
-    "member"
-  ],
-  [
-    "src/component.js~connectedcomponent#noderefhandler",
-    "class/src/Component.js~ConnectedComponent.html#instance-method-nodeRefHandler",
-    "src/Component.js~ConnectedComponent#nodeRefHandler",
-    "method"
-  ],
-  [
-    "src/component.js~connectedcomponent#reacttochangestate",
-    "class/src/Component.js~ConnectedComponent.html#instance-method-reactToChangeState",
-    "src/Component.js~ConnectedComponent#reactToChangeState",
-    "method"
-  ],
-  [
-    "src/component.js~connectedcomponent#rendercomponent",
-    "class/src/Component.js~ConnectedComponent.html#instance-method-renderComponent",
-    "src/Component.js~ConnectedComponent#renderComponent",
-    "method"
-  ],
-  [
-    "src/component.js~connectedcomponent#subscribersid",
-    "class/src/Component.js~ConnectedComponent.html#instance-member-subscribersId",
-    "src/Component.js~ConnectedComponent#subscribersId",
-    "member"
-  ],
-  [
-    "src/component.js~connectedcomponent#wrappernode",
-    "class/src/Component.js~ConnectedComponent.html#instance-method-wrapperNode",
-    "src/Component.js~ConnectedComponent#wrapperNode",
-    "method"
-  ],
-  [
     "src/store.js",
     "file/src/Store.js.html",
     "src/Store.js",
     "file"
+  ],
+  [
+    "src/store.js~store#componentssubscribes",
+    "class/src/Store.js~Store.html#instance-member-componentsSubscribes",
+    "src/Store.js~Store#componentsSubscribes",
+    "member"
   ],
   [
     "src/store.js~store#constructor",
@@ -484,6 +466,18 @@ window.esdocSearchIndex = [
     "class/src/Store.js~Store.html#instance-member-subscribers",
     "src/Store.js~Store#subscribers",
     "member"
+  ],
+  [
+    "src/store.js~store#unsubscribeall",
+    "class/src/Store.js~Store.html#instance-method-unsubscribeAll",
+    "src/Store.js~Store#unsubscribeAll",
+    "method"
+  ],
+  [
+    "src/store.js~store#unsubscribebyeventandid",
+    "class/src/Store.js~Store.html#instance-method-unsubscribeByEventAndId",
+    "src/Store.js~Store#unsubscribeByEventAndId",
+    "method"
   ],
   [
     "src/store.js~store#unsubsribe",

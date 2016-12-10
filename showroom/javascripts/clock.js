@@ -1,19 +1,15 @@
 import * as SimpleDom from 'simpledom-component';
 
-class Clock extends SimpleDom.ConnectedComponent {
+class Clock extends SimpleDom.Component {
     eventsToSubscribe() {
         return ['UPDATE_CLOCK'];
     }
 
     render() {
-        return [
-                <h1>Hello, world!</h1>,
+        return <p style={{color: new Date().getSeconds()%2 ? 'red' : 'black'}}>
+                <h1>Hello, world!</h1>
                 <h2>It is {new Date().toLocaleTimeString()}.</h2>
-        ];
-    }
-
-    wrapperNode() {
-        return <p style={{color: new Date().getSeconds()%2 ? 'red' : 'black'}}/>;
+        </p>;
     }
 
 }

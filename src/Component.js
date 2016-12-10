@@ -49,6 +49,63 @@ export class Component {
             .filter(name => name !== 'constructor')
             .filter(name => this[name] instanceof Function)
             .forEach(name => this[name] = this[name].bind(this));
+
+        for (const event of this.eventsToSubscribe()) {
+            this.store.subscribe(event, this.reactToChangeState.bind(this), this);
+        }
+    }
+
+
+    /**
+     * Do not touch :)
+     * @param {Node} node parent node of the component.
+     */
+    nodeRefHandler(node) {
+        /**
+         * Parent node of the component.
+         * @type {Node}
+         */
+        this.node = node;
+    }
+
+    /**
+     * Internally method which is called when an event of {@link eventsToSubscribe}
+     * You can override the method if you want a specific
+     * @param {string} event event received in the store.
+     * @param {Object} state the new state.
+     */
+    reactToChangeState(event, state) {
+        if (!this.mustRefresh() || !this.node) {
+            return;
+        }
+
+        let convertedElement = convertToSimpleDom(this.renderComponent(), this.store);
+        const oldNode = this.node;
+        if (convertedElement.simpleDomEl === undefined && convertedElement.simpleDomEl === null) {
+            oldNode.parentNode.removeChild(oldNode);
+            return;
+        }
+        const newNode = SimpleDom.convertToNode(convertedElement.simpleDomEl);
+        oldNode.parentNode.replaceChild(newNode, oldNode);
+
+        convertedElement.componentList.forEach(component => component.componentDidMount());
+        this.componentDidMount();
+    }
+
+    /**
+     * Method to implement to react when an event is send to {@link Store}
+     * @return {Array} array of string events to react.
+     */
+    eventsToSubscribe() {
+        return [];
+    }
+
+
+    /**
+     * Return false to avoid call to render on an event.
+     */
+    mustRefresh() {
+        return true;
     }
 
     /**
@@ -63,7 +120,19 @@ export class Component {
      * @return {Component|Object} This return a component or result of SimpleDom.el.
      */
     renderComponent() {
-        return this.render();
+        const result = this.render();
+        if (this.eventsToSubscribe() && this.eventsToSubscribe().length > 0) {
+            if (result === undefined || result === null) {
+                return <div ref={node => this.nodeRefHandler(node)} style={{width:0,height:0}}/>;
+            }
+
+            let firstSimpleDomChild = result;
+            while (firstSimpleDomChild && !firstSimpleDomChild.isElem) {
+                firstSimpleDomChild = firstSimpleDomChild.children && firstSimpleDomChild.children[0];
+            }
+            firstSimpleDomChild.attrs.ref = node => this.nodeRefHandler(node);
+        }
+        return result;
     }
 
     /**
@@ -73,123 +142,6 @@ export class Component {
      */
     render() {
         return undefined;
-    }
-
-}
-
-/**
- * Class for a component which react to store events.
- *
- *
- * ```
- *   class Counter extends ConnectedComponent {
- *      eventsToSubscribe() {
- *          return [ 'UPDATE_COUNTER' ];
- *      }
- *
- *      render() {
- *          return (
- *              <h1>{this.state.counter}</h1>
- *          );
- *      }
- *   }
- *
- *   renderToDom('container', <Counter />);
- * ```
- *
- * @extends {Component}
- */
-export class ConnectedComponent extends Component {
-
-    /**
-     * Do not touch :)
-     * @param {Node} node parent node of the component.
-     */
-    nodeRefHandler(node) {
-        /**
-         * Parent node of the component.
-         * @type {Node}
-         */
-        this.node = node;
-        /**
-         * Do not touch :)
-         * @type {Array}
-         */
-        this.subscribersId = [];
-        for (const event of this.eventsToSubscribe()) {
-            this.subscribersId.push(this.store.subscribe(event, this.reactToChangeState.bind(this)));
-        }
-
-
-        const mutationObserver = new MutationObserver(mutations => {
-            if (flatten(mutations.map(mutation => Array.from(mutation.removedNodes)))
-                .findIndex(removedNode => removedNode.contains(this.node)) !== -1) {
-                mutationObserver.disconnect();
-                for (const subscriberId of this.subscribersId) {
-                    this.store.unsubsribe(subscriberId);
-                }
-            }
-        });
-
-        mutationObserver.observe(document.body, {childList: true, subtree: true});
-    }
-
-    /**
-     * Return false to avoid call to render on an event.
-     */
-    mustRefresh() {
-        return true;
-    }
-
-    /**
-     * Internally method which is called when an event of {@link eventsToSubscribe}
-     * You can override the method if you want a specific
-     * @param {string} event event received in the store.
-     * @param {Object} state the new state.
-     */
-    reactToChangeState(event, state) {
-        if (!this.mustRefresh()) {
-            return;
-        }
-        let convertedElement = convertToSimpleDom(this.render(), this.store);
-        const oldNode = this.node;
-        this.node = SimpleDom.convertToNode(this.wrapperNode());
-        SimpleDom.renderTo(this.node,
-            convertedElement.simpleDomEl
-        );
-        oldNode.parentNode.replaceChild(this.node, oldNode);
-
-        convertedElement.componentList.forEach(component => component.componentDidMount());
-        this.componentDidMount();
-    }
-
-    /**
-     * Method to implement to react when an event is send to {@link Store}
-     * @return {Array} array of string events to react.
-     */
-    eventsToSubscribe() {
-        return [];
-    }
-
-    /**
-     * Method use internally to render a component.
-     * @return {Component|Object} This return a component or result of SimpleDom.el.
-     */
-    renderComponent() {
-        const wrapper = this.wrapperNode();
-        wrapper.attrs.ref = node => this.nodeRefHandler(node);
-        wrapper.children = flatten([this.render()]);
-        return wrapper;
-    }
-
-    /**
-     * Node wrapping render
-     * Default is ```<div/```
-     * @abstract
-     * @return {Object} simpledom.el result.
-     */
-    wrapperNode() {
-        return <div/>;
     }
 
 }

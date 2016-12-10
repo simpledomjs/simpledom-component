@@ -26,6 +26,12 @@ export class Store {
          * @type {Object}
          */
         this.subscribers = {};
+
+        /**
+         * Don't touch :)
+         * @type {Array}
+         */
+        this.componentsSubscribes = [];
     }
 
     /**
@@ -47,14 +53,35 @@ export class Store {
      * Method to call to subscribe to an event.
      * @param {string} event event to subscribe.
      * @param {function(event: string, state: object)} callback the callback called when receive the event.
+     * @param {Component} component use internally to unsubcribe component when node disappear
      * @return {number} the id to put in param of {@link unsubscribe} to unsubscribe.
      */
-    subscribe(event, callback = state => {}) {
+    subscribe(event, callback = state => {}, component) {
         if (!this.subscribers[event]) {
             this.subscribers[event] = {};
         }
         const id = generateId();
         this.subscribers[event][id] = callback;
+
+        let componentWrapper = undefined;
+        for (const componentAlreadySubcribes of this.componentsSubscribes) {
+            if (componentAlreadySubcribes.component === component) {
+                componentWrapper = componentAlreadySubcribes;
+                break;
+            }
+        }
+        if (!componentWrapper) {
+            componentWrapper = {
+                component,
+                subscribes: []
+            };
+            this.componentsSubscribes.push(componentWrapper);
+        }
+        componentWrapper.subscribes.push({
+            event,
+            id
+        });
+
         return id;
     }
 
@@ -67,6 +94,27 @@ export class Store {
             if (this.subscribers[event][id]) {
                 delete this.subscribers[event][id];
             }
+        }
+    }
+
+    /**
+     * Unsubcribe all subcribers.
+     */
+    unsubscribeAll() {
+        this.subscribers = {};
+        this.componentsSubscribes = [];
+    }
+
+
+
+    /**
+     * Unsubscribe.
+     * @param {string} event event sent to {@link subscribe}
+     * @param {number} id id received at {@link subscribe}
+     */
+    unsubscribeByEventAndId(event, id) {
+        if (this.subscribers[event][id]) {
+            delete this.subscribers[event][id];
         }
     }
 }

@@ -175,6 +175,11 @@
     <script src="simpledom-component.js"></script>
 
     <script>
+        function getParameterByName(name) {
+            var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
+            return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+        }
+
         //
         ///- REQUIRE FN
         // equivalent to require from node.js
@@ -302,8 +307,20 @@
           }
         }).then(version => SimpleDom.renderTo('version', version));
 
+        const chooseSample = getParameterByName('sample');
+
+        if (chooseSample) {
+            document.querySelector('div.header').style.display = 'none';
+            document.querySelector('nav').style.display = 'none';
+            document.querySelector('body').style.paddingTop = '0';
+        }
+
         fetch('samples.json').then(response => response.json()).then(samples =>
-            Promise.all(samples.map(processSample)).then(samplesResult => {
+            Promise.all(
+                samples.filter(sample =>
+                    !chooseSample || chooseSample === sample.id
+                ).map(processSample)
+            ).then(samplesResult => {
                 SimpleDom.renderTo('samples', samplesResult.map(sample => sample.component));
                 samplesResult.forEach(sample => {
                     const editor = ace.edit(sample.id + '-code-content-editor');

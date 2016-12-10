@@ -1,6 +1,6 @@
 import * as SimpleDom from 'simpledom-component';
 
-class Counter extends SimpleDom.ConnectedComponent {
+class Counter extends SimpleDom.Component {
     eventsToSubscribe() {
         return ['UPDATE_COUNTER'];
     }
