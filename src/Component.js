@@ -1,7 +1,6 @@
 
 import * as SimpleDom from 'simpledom.js';
 import { convertToSimpleDom } from './converter';
-import { flatten } from './util';
 
 /**
  * Class for a component.
@@ -123,7 +122,15 @@ export class Component {
         const result = this.render();
         if (this.eventsToSubscribe() && this.eventsToSubscribe().length > 0) {
             if (result === undefined || result === null) {
-                return <div ref={node => this.nodeRefHandler(node)} style={{width:0,height:0}}/>;
+                return SimpleDom.el('div',
+                    {
+                        ref: node => this.nodeRefHandler(node),
+                        style: {
+                            width: 0,
+                            height: 0
+                        }
+                    }
+                );
             }
 
             let firstSimpleDomChild = result;
