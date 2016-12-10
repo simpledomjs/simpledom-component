@@ -106,24 +106,26 @@ export class Store {
         const id = generateId();
         this.subscribers[event][id] = callback;
 
-        let componentWrapper = undefined;
-        for (const componentAlreadySubcribes of this.componentsSubscribes) {
-            if (componentAlreadySubcribes.component === component) {
-                componentWrapper = componentAlreadySubcribes;
-                break;
+        if (component) {
+            let componentWrapper = undefined;
+            for (const componentAlreadySubcribes of this.componentsSubscribes) {
+                if (componentAlreadySubcribes.component === component) {
+                    componentWrapper = componentAlreadySubcribes;
+                    break;
+                }
             }
+            if (!componentWrapper) {
+                componentWrapper = {
+                    component,
+                    subscribes: []
+                };
+                this.componentsSubscribes.push(componentWrapper);
+            }
+            componentWrapper.subscribes.push({
+                event,
+                id
+            });
         }
-        if (!componentWrapper) {
-            componentWrapper = {
-                component,
-                subscribes: []
-            };
-            this.componentsSubscribes.push(componentWrapper);
-        }
-        componentWrapper.subscribes.push({
-            event,
-            id
-        });
 
         return id;
     }

@@ -44,7 +44,6 @@
 <pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">
 import * as SimpleDom from &apos;simpledom.js&apos;;
 import { convertToSimpleDom } from &apos;./converter&apos;;
-import { flatten } from &apos;./util&apos;;
 
 /**
  * Class for a component.
@@ -166,7 +165,15 @@ export class Component {
         const result = this.render();
         if (this.eventsToSubscribe() &amp;&amp; this.eventsToSubscribe().length &gt; 0) {
             if (result === undefined || result === null) {
-                return &lt;div ref={node =&gt; this.nodeRefHandler(node)} style={{width:0,height:0}}/&gt;;
+                return SimpleDom.el(&apos;div&apos;,
+                    {
+                        ref: node =&gt; this.nodeRefHandler(node),
+                        style: {
+                            width: 0,
+                            height: 0
+                        }
+                    }
+                );
             }
 
             let firstSimpleDomChild = result;
