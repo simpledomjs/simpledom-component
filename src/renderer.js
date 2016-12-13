@@ -45,19 +45,16 @@ export function renderToDom(container, component, store = new Store()) {
     }
 
     const mutationObserver = new MutationObserver(mutations => {
-        for (const removedNode of flatten(mutations.map(mutation => Array.from(mutation.removedNodes)))) {
-            if (removedNode.contains(rootNode)) {
-                mutationObserver.disconnect();
-                store.unsubscribeAll();
-            }
-
-            for (let index = store.componentsSubscribes.length - 1; index >= 0; index--) {
-                const component = store.componentsSubscribes[index];
-                if (component.component.node && removedNode.contains(component.component.node)) {
-                    component.subscribes.forEach(({event, id}) => store.unsubscribeByEventAndId(event, id));
-                    component.component.node = undefined;
-                    store.componentsSubscribes.splice(index, 1);
-                }
+        if (!document.body.contains(rootNode)) {
+            mutationObserver.disconnect();
+            store.unsubscribeAll();
+        }
+        for (let index = store.componentsSubscribes.length - 1; index >= 0; index--) {
+            const component = store.componentsSubscribes[index];
+            if (component.component.node && !rootNode.contains(component.component.node)) {
+                component.subscribes.forEach(({event, id}) => store.unsubscribeByEventAndId(event, id));
+                component.component.node = undefined;
+                store.componentsSubscribes.splice(index, 1);
             }
         }
     });
