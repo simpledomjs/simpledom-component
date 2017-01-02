@@ -34,78 +34,149 @@
     
   <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/Component.js~Component.html">Component</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/Store.js~Store.html">Store</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-predicate">predicate</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-el">el</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-renderTo">renderTo</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-renderToDom">renderToDom</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-renderToString">renderToString</a></span></span></li>
 </ul>
 </div>
 </nav>
 
 <div class="content" data-ice="content"><h1 data-ice="title">src/renderer.js</h1>
-<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import * as SimpleDom from &apos;simpledom.js&apos;;
-import { convertToSimpleDom } from &apos;./converter&apos;;
-import { flatten } from &apos;./util&apos;;
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import { convertToNode } from &apos;./converter&apos;;
+import { flatten, dasherize, isFunction } from &apos;./util&apos;;
 import { Store } from &apos;./Store&apos;;
 
 
 /**
  * JSX factory function to create an object representing a dom node. Designed to be used with a JSX transpiler.
- * @param {Object|Component|string} el the name of the tag, or a {@link Component}.
+ * @param {Object|Component|string|function} element the name of the tag, or a {@link Component}.
  * @param {Object} attrs properties of the node, a plain old JS object. Not optional, if no value, put empty object.
  * @param {Array} children the children of the node, a vararg
  * @return {Object} an object representing a dom node.
  */
-export function el(el, attrs, ...children) {
-    if (el &amp;&amp; el.isComponent) {
+export function el(element, attrs, ...children) {
+    if (element &amp;&amp; element.isComponent) {
         const props = {
             ...attrs,
             children: (flatten(children) || []).filter(child =&gt; child !== null &amp;&amp; child !== undefined)
         };
         return {
             isComponent: true,
-            componentClass: el,
+            componentClass: element,
             props
         };
     } else {
-        return SimpleDom.el(el, attrs, ...children);
+        if (isFunction(element)) {
+            return element(attrs, ...children);
+        }
+        return {
+            name: element,
+            attrs: attrs || {},
+            children: (flatten(children) || []).filter(child =&gt; child !== null &amp;&amp; child !== undefined),
+            isElem: true
+        };
     }
+}
+
+function cleanAnGetNode(node) {
+    let realNode = node;
+    if (typeof node === &apos;string&apos;) {
+        realNode = document.getElementById(node);
+    }
+
+    while (realNode.firstChild) {
+        realNode.removeChild(realNode.firstChild);
+    }
+    return realNode;
 }
 
 /**
  * Render a component to the dom.
- * @param {string|Node} container the id or the node where the component must be rendered.
+ * @param {string|Node} node the id or the node where the component must be rendered.
  * @param {Component} component the component to render.
  * @param {Store} store the store
  */
-export function renderToDom(container, component, store = new Store()) {
-    let convertedElements = convertToSimpleDom(component, store);
-    SimpleDom.renderTo(container, convertedElements.simpleDomEl);
-    convertedElements.componentList.forEach(component =&gt; component.componentDidMount());
+export function renderToDom(node, component, store = new Store()) {
 
+    const realNode = cleanAnGetNode(node);
 
-    let rootNode = container;
-    if (typeof rootNode === &apos;string&apos;) {
-        rootNode = document.getElementById(container);
-    }
+    const componentList = [];
 
-    const mutationObserver = new MutationObserver(mutations =&gt; {
-        if (!document.body.contains(rootNode)) {
-            mutationObserver.disconnect();
-            store.unsubscribeAll();
-        }
-        for (let index = store.componentsSubscribes.length - 1; index &gt;= 0; index--) {
-            const component = store.componentsSubscribes[index];
-            if (component.component.node &amp;&amp; !rootNode.contains(component.component.node)) {
-                component.subscribes.forEach(({event, id}) =&gt; store.unsubscribeByEventAndId(event, id));
-                component.component.node = undefined;
-                store.componentsSubscribes.splice(index, 1);
+    const convertedNode = convertToNode(component, store, componentList);
+
+    realNode.appendChild(convertedNode);
+
+    componentList.forEach(component =&gt; component.componentDidMount());
+
+    if (componentList.length) {
+        const mutationObserver = new MutationObserver(() =&gt; {
+            if (!document.body.contains(realNode)) {
+                mutationObserver.disconnect();
+                store.unsubscribeAll();
             }
+            for (let index = store.componentsSubscribes.length - 1; index &gt;= 0; index--) {
+                const component = store.componentsSubscribes[index];
+                if (component.component.node &amp;&amp; !realNode.contains(component.component.node)) {
+                    component.subscribes.forEach(({event, id}) =&gt; store.unsubscribeByEventAndId(event, id));
+                    component.component.node = undefined;
+                    store.componentsSubscribes.splice(index, 1);
+                }
+            }
+        });
+
+
+        mutationObserver.observe(document.body, {childList: true, subtree: true});
+    }
+}
+
+/**
+ * Render some elements into a string.
+ * @param {Array} elements elements returned by {@link el} or primitive like string.
+ * @return {string} html as a string.
+ */
+export function renderToString(...elements) {
+    return flatten(elements).map(el =&gt; {
+        if (!el.name) {
+            return &apos;&apos; + (el.__asHtml || el);
         }
-    });
+        const attributes = Object.keys(el.attrs)
+            .filter(attribute =&gt; !attribute.startsWith(&apos;on&apos;) &amp;&amp; el.attrs[attribute] !== undefined &amp;&amp; attribute !== &apos;ref&apos;)
+            .map(attribute =&gt; {
+                const key = dasherize(attribute === &apos;className&apos; ? &apos;class&apos; : attribute);
+                let value = el.attrs[attribute];
+                if (key === &apos;style&apos; &amp;&amp; typeof value === &apos;object&apos;) {
+                    value = Object.keys(value)
+                        .map(key =&gt; &apos;&apos; + dasherize(key) + &apos;:&apos; + value[key])
+                        .join(&apos;;&apos;);
+                } else if (key === &apos;class&apos; &amp;&amp; typeof value === &apos;object&apos;) {
+                    value = Object.keys(value).filter(classValue =&gt; value[classValue])
+                        .map(dasherize)
+                        .join(&apos; &apos;);
+                }
+
+                return ` ${key}=&quot;${value}&quot;`
+            })
+            .join(&apos;&apos;);
+        const content = renderToString(...el.children);
+        return `&lt;${el.name}${attributes}&gt;${content}&lt;/${el.name}&gt;`
+    }).join(&apos;&apos;);
+}
 
 
-    mutationObserver.observe(document.body, {childList: true, subtree: true});
+/**
+ * Render some elements into a node.
+ * @param {string|Node} node the id or the node where the component must be rendered.
+ * @param {Array} elements elements returned by {@link el} or primitive like string.
+ */
+export function renderTo(node, ...elements) {
+    const realNode = cleanAnGetNode(node);
 
-}</code></pre>
+    flatten(elements).filter(element =&gt; element !== undefined &amp;&amp; element !== null).map(convertToNode)
+        .forEach(node =&gt; realNode.appendChild(node));
+}
+</code></pre>
 
 </div>
 

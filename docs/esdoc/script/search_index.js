@@ -18,9 +18,27 @@ window.esdocSearchIndex = [
     "function"
   ],
   [
+    "simpledom-component~predicate",
+    "function/index.html#static-function-predicate",
+    "<span>predicate</span> <span class=\"search-result-import-path\">simpledom-component</span>",
+    "function"
+  ],
+  [
+    "simpledom-component~renderto",
+    "function/index.html#static-function-renderTo",
+    "<span>renderTo</span> <span class=\"search-result-import-path\">simpledom-component</span>",
+    "function"
+  ],
+  [
     "simpledom-component~rendertodom",
     "function/index.html#static-function-renderToDom",
     "<span>renderToDom</span> <span class=\"search-result-import-path\">simpledom-component</span>",
+    "function"
+  ],
+  [
+    "simpledom-component~rendertostring",
+    "function/index.html#static-function-renderToString",
+    "<span>renderToString</span> <span class=\"search-result-import-path\">simpledom-component</span>",
     "function"
   ],
   [

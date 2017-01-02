@@ -34,16 +34,19 @@
     
   <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/Component.js~Component.html">Component</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/Store.js~Store.html">Store</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-predicate">predicate</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-el">el</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-renderTo">renderTo</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-renderToDom">renderToDom</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-renderToString">renderToString</a></span></span></li>
 </ul>
 </div>
 </nav>
 
 <div class="content" data-ice="content"><h1 data-ice="title">src/Component.js</h1>
 <pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">
-import * as SimpleDom from &apos;simpledom.js&apos;;
-import { convertToSimpleDom } from &apos;./converter&apos;;
+import { el } from &apos;./renderer&apos;;
+import { convertToNode } from &apos;./converter&apos;;
 
 /**
  * Class for a component.
@@ -114,23 +117,26 @@ export class Component {
      * Internally method which is called when an event of {@link eventsToSubscribe}
      * You can override the method if you want a specific
      * @param {string} event event received in the store.
-     * @param {Object} state the new state.
+     * @param {Object} newState the new state.
+     * @param {Object} oldState the old state.
      */
-    reactToChangeState(event, state) {
-        if (!this.mustRefresh() || !this.node) {
+    reactToChangeState(event, newState, oldState) {
+        if (!this.mustRefresh(oldState, newState) || !this.node) {
             return;
         }
 
-        let convertedElement = convertToSimpleDom(this.renderComponent(), this.store);
+        const componentList = [];
         const oldNode = this.node;
-        if (convertedElement.simpleDomEl === undefined &amp;&amp; convertedElement.simpleDomEl === null) {
+        this.node = null;
+        let newNode = convertToNode(this.renderComponent(), this.store, componentList);
+        if (newNode === undefined &amp;&amp; newNode === null) {
             oldNode.parentNode.removeChild(oldNode);
+            this.componentDidMount();
             return;
         }
-        const newNode = SimpleDom.convertToNode(convertedElement.simpleDomEl);
         oldNode.parentNode.replaceChild(newNode, oldNode);
 
-        convertedElement.componentList.forEach(component =&gt; component.componentDidMount());
+        componentList.forEach(component =&gt; component.componentDidMount());
         this.componentDidMount();
     }
 
@@ -145,8 +151,10 @@ export class Component {
 
     /**
      * Return false to avoid call to render on an event.
+     * @param {Object} oldState the old state.
+     * @param {Object} newState the new state.
      */
-    mustRefresh() {
+    mustRefresh(oldState, newState) {
         return true;
     }
 
@@ -165,7 +173,7 @@ export class Component {
         const result = this.render();
         if (this.eventsToSubscribe() &amp;&amp; this.eventsToSubscribe().length &gt; 0) {
             if (result === undefined || result === null) {
-                return SimpleDom.el(&apos;div&apos;,
+                return el(&apos;div&apos;,
                     {
                         ref: node =&gt; this.nodeRefHandler(node),
                         style: {
@@ -188,7 +196,7 @@ export class Component {
     /**
      * Method to implement to render something.
      * @abstract
-     * @return {Component|Object} This return a component or result of SimpleDom.el.
+     * @return {Component|Object} This return a component or result of {@link el}.
      */
     render() {
         return undefined;
