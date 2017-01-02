@@ -30,19 +30,7 @@ module.exports = {
                         "transform-class-properties"
                     ]
                 }
-            },
-            {   test: /\.css$/,
-                loader: "style-loader!css-loader"
-            },
-            {
-                test: /\.less$/,
-                loader: 'style-loader!css-loader!less-loader'
-            },
-            {
-                test: /\.svg$/,
-                loader: 'url-loader?limit=100000'
-            },
-            { test: /\.ttf$/, loader: "file-loader" }
+            }
         ]
     },
     eslint: {

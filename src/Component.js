@@ -1,6 +1,6 @@
 
-import * as SimpleDom from 'simpledom.js';
-import { convertToSimpleDom } from './converter';
+import { el } from './renderer';
+import { convertToNode } from './converter';
 
 /**
  * Class for a component.
@@ -71,23 +71,26 @@ export class Component {
      * Internally method which is called when an event of {@link eventsToSubscribe}
      * You can override the method if you want a specific
      * @param {string} event event received in the store.
-     * @param {Object} state the new state.
+     * @param {Object} newState the new state.
+     * @param {Object} oldState the old state.
      */
-    reactToChangeState(event, state) {
-        if (!this.mustRefresh() || !this.node) {
+    reactToChangeState(event, newState, oldState) {
+        if (!this.mustRefresh(oldState, newState) || !this.node) {
             return;
         }
 
-        let convertedElement = convertToSimpleDom(this.renderComponent(), this.store);
+        const componentList = [];
         const oldNode = this.node;
-        if (convertedElement.simpleDomEl === undefined && convertedElement.simpleDomEl === null) {
+        this.node = null;
+        let newNode = convertToNode(this.renderComponent(), this.store, componentList);
+        if (newNode === undefined && newNode === null) {
             oldNode.parentNode.removeChild(oldNode);
+            this.componentDidMount();
             return;
         }
-        const newNode = SimpleDom.convertToNode(convertedElement.simpleDomEl);
         oldNode.parentNode.replaceChild(newNode, oldNode);
 
-        convertedElement.componentList.forEach(component => component.componentDidMount());
+        componentList.forEach(component => component.componentDidMount());
         this.componentDidMount();
     }
 
@@ -102,8 +105,10 @@ export class Component {
 
     /**
      * Return false to avoid call to render on an event.
+     * @param {Object} oldState the old state.
+     * @param {Object} newState the new state.
      */
-    mustRefresh() {
+    mustRefresh(oldState, newState) {
         return true;
     }
 
@@ -122,7 +127,7 @@ export class Component {
         const result = this.render();
         if (this.eventsToSubscribe() && this.eventsToSubscribe().length > 0) {
             if (result === undefined || result === null) {
-                return SimpleDom.el('div',
+                return el('div',
                     {
                         ref: node => this.nodeRefHandler(node),
                         style: {
@@ -145,7 +150,7 @@ export class Component {
     /**
      * Method to implement to render something.
      * @abstract
-     * @return {Component|Object} This return a component or result of SimpleDom.el.
+     * @return {Component|Object} This return a component or result of {@link el}.
      */
     render() {
         return undefined;

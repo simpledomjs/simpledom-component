@@ -1,5 +1,4 @@
 
-import {flatten} from './util';
 
 let generatedId = 1;
 
@@ -40,19 +39,26 @@ export class Store {
      * @param {...string} events events to the origin of the state change.
      */
     updateState(newState, ...events) {
+        const oldState = this.state;
         this.state = {...this.state, ...newState};
-        flatten(
-            events.map(event =>
-                Object.keys(this.subscribers[event] || {})
-                    .map(id => this.subscribers[event][id])
-            )
-        ).forEach(callback => callback(event, this.state));
+
+        let index = events.length;
+        while (index--) {
+            const event = events[index];
+            if (this.subscribers[event]) {
+                for (const id in this.subscribers[event]) {
+                    if (this.subscribers[event].hasOwnProperty(id)) {
+                        this.subscribers[event][id](event, this.state, oldState);
+                    }
+                }
+            }
+        }
     }
 
     /**
      * Method to call to subscribe to an event.
      * @param {string} event event to subscribe.
-     * @param {function(event: string, state: object)} callback the callback called when receive the event.
+     * @param {function(event: string, state: object, oldState:object)} callback the callback called when receive the event.
      * @param {Component} component use internally to unsubcribe component when node disappear
      * @return {number} the id to put in param of {@link unsubscribe} to unsubscribe.
      */
