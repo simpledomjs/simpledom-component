@@ -59,10 +59,12 @@ export function convertToNode(element, store, componentList) {
         const childElement = element.children[index];
         if (childElement !== undefined && childElement !== null) {
             const childNode = convertToNode(childElement, store, componentList);
-            if (childNode.__asHtml) {
-                node.insertAdjacentHTML('beforeend', childNode.__asHtml);
-            } else {
-                node.appendChild(childNode);
+            if (childNode !== undefined && childNode !== null) {
+                if (childNode.__asHtml) {
+                    node.insertAdjacentHTML('beforeend', childNode.__asHtml);
+                } else {
+                    node.appendChild(childNode);
+                }
             }
         }
     }

@@ -40,6 +40,33 @@ describe('SimpleDom component API', () => {
                 '<h1>Hello John!</h1>');
         });
 
+        it('Bug with component with no render if precedent has render', () => {
+            cleanContainer();
+
+            class ComponantA extends SimpleDom.Component {
+                render() {
+                    return (
+                        <div></div>
+                    )
+                }
+            }
+
+            class ComponentB extends SimpleDom.Component {
+
+            }
+
+            SimpleDom.renderToDom(
+                'container',
+                <div>
+                    <ComponantA/>
+                    <ComponentB/>
+                </div>
+            );
+
+            expect(document.getElementById('container').innerHTML).to.be.equal('<div><div></div></div>');
+
+        });
+
         it('Un simple reactive component', () => {
             cleanContainer();
 
