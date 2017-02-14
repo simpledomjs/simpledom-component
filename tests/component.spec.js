@@ -15,6 +15,29 @@ function cleanContainer() {
     document.body.appendChild(container);
 }
 
+describe('Store API', () => {
+    it('Catch all', () => {
+        const store = new SimpleDom.Store();
+
+        let eventCounter = 0;
+        let allCounter = 0;
+
+        store.subscribe('event', () => eventCounter++);
+        store.subscribe('*', () => allCounter++);
+
+        store.updateState({}, 'otherEvent');
+
+        expect(allCounter).to.be.equal(1);
+        expect(eventCounter).to.be.equal(0);
+
+        store.updateState({}, 'event');
+
+        expect(allCounter).to.be.equal(2);
+        expect(eventCounter).to.be.equal(1);
+
+    });
+});
+
 describe('SimpleDom component API', () => {
 
 

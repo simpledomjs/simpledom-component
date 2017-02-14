@@ -42,9 +42,11 @@ export class Store {
         const oldState = this.state;
         this.state = {...this.state, ...newState};
 
-        let index = events.length;
+        const eventsToPropagate = events.concat('*');
+
+        let index = eventsToPropagate.length;
         while (index--) {
-            const event = events[index];
+            const event = eventsToPropagate[index];
             if (this.subscribers[event]) {
                 for (const id in this.subscribers[event]) {
                     if (this.subscribers[event].hasOwnProperty(id)) {
@@ -57,6 +59,9 @@ export class Store {
 
     /**
      * Method to call to subscribe to an event.
+     *
+     * There is a special event that catches all events : '*'.
+     *
      * @param {string} event event to subscribe.
      * @param {function(event: string, state: object, oldState:object)} callback the callback called when receive the event.
      * @param {Component} component use internally to unsubcribe component when node disappear
