@@ -811,7 +811,7 @@
     "access": null,
     "description": null,
     "lineNumber": 1,
-    "content": "import { convertToNode } from './converter';\nimport { flatten, dasherize, isFunction } from './util';\nimport { Store } from './Store';\n\n\n/**\n * JSX factory function to create an object representing a dom node. Designed to be used with a JSX transpiler.\n * @param {Object|Component|string|function} element the name of the tag, or a {@link Component}.\n * @param {Object} attrs properties of the node, a plain old JS object. Not optional, if no value, put empty object.\n * @param {Array} children the children of the node, a vararg\n * @return {Object} an object representing a dom node.\n */\nexport function el(element, attrs, ...children) {\n    if (element && element.isComponent) {\n        const props = {\n            ...attrs,\n            children: (flatten(children) || []).filter(child => child !== null && child !== undefined)\n        };\n        return {\n            isComponent: true,\n            componentClass: element,\n            props\n        };\n    } else {\n        if (isFunction(element)) {\n            return element(attrs, ...children);\n        }\n        return {\n            name: element,\n            attrs: attrs || {},\n            children: (flatten(children) || []).filter(child => child !== null && child !== undefined),\n            isElem: true\n        };\n    }\n}\n\nfunction cleanAnGetNode(node) {\n    let realNode = node;\n    if (typeof node === 'string') {\n        realNode = document.getElementById(node);\n    }\n\n    while (realNode.firstChild) {\n        realNode.removeChild(realNode.firstChild);\n    }\n    return realNode;\n}\n\n/**\n * Render a component to the dom.\n * @param {string|Node} node the id or the node where the component must be rendered.\n * @param {Component} component the component to render.\n * @param {Store} store the store\n */\nexport function renderToDom(node, component, store = new Store()) {\n\n    const realNode = cleanAnGetNode(node);\n\n    const componentList = [];\n\n    const convertedNode = convertToNode(component, store, componentList);\n\n    realNode.appendChild(convertedNode);\n\n    componentList.forEach(component => component.componentDidMount());\n\n    if (componentList.length) {\n        const mutationObserver = new MutationObserver(() => {\n            if (!document.body.contains(realNode)) {\n                mutationObserver.disconnect();\n                store.unsubscribeAll();\n            }\n            for (let index = store.componentsSubscribes.length - 1; index >= 0; index--) {\n                const component = store.componentsSubscribes[index];\n                if (component.component.node && !realNode.contains(component.component.node)) {\n                    component.subscribes.forEach(({event, id}) => store.unsubscribeByEventAndId(event, id));\n                    component.component.node = undefined;\n                    store.componentsSubscribes.splice(index, 1);\n                }\n            }\n        });\n\n\n        mutationObserver.observe(document.body, {childList: true, subtree: true});\n    }\n}\n\n/**\n * Render some elements into a string.\n * @param {Array} elements elements returned by {@link el} or primitive like string.\n * @return {string} html as a string.\n */\nexport function renderToString(...elements) {\n    return flatten(elements).map(el => {\n        if (!el.name) {\n            return '' + (el.__asHtml || el);\n        }\n        const attributes = Object.keys(el.attrs)\n            .filter(attribute => !attribute.startsWith('on') && el.attrs[attribute] !== undefined && attribute !== 'ref')\n            .map(attribute => {\n                const key = dasherize(attribute === 'className' ? 'class' : attribute);\n                let value = el.attrs[attribute];\n                if (key === 'style' && typeof value === 'object') {\n                    value = Object.keys(value)\n                        .map(key => '' + dasherize(key) + ':' + value[key])\n                        .join(';');\n                } else if (key === 'class' && typeof value === 'object') {\n                    value = Object.keys(value).filter(classValue => value[classValue])\n                        .map(dasherize)\n                        .join(' ');\n                }\n\n                return ` ${key}=\"${value}\"`\n            })\n            .join('');\n        const content = renderToString(...el.children);\n        return `<${el.name}${attributes}>${content}</${el.name}>`\n    }).join('');\n}\n\n\n/**\n * Render some elements into a node.\n * @param {string|Node} node the id or the node where the component must be rendered.\n * @param {Array} elements elements returned by {@link el} or primitive like string.\n */\nexport function renderTo(node, ...elements) {\n    const realNode = cleanAnGetNode(node);\n\n    flatten(elements).filter(element => element !== undefined && element !== null).map(convertToNode)\n        .forEach(node => realNode.appendChild(node));\n}\n"
+    "content": "import { convertToNode } from './converter';\nimport { flatten, dasherize, isFunction } from './util';\nimport { Store } from './Store';\n\n\n/**\n * JSX factory function to create an object representing a dom node. Designed to be used with a JSX transpiler.\n * @param {Object|Component|string|function} element the name of the tag, or a {@link Component}.\n * @param {Object} attrs properties of the node, a plain old JS object. Not optional, if no value, put empty object.\n * @param {Array} children the children of the node, a vararg\n * @return {Object} an object representing a dom node.\n */\nexport function el(element, attrs, ...children) {\n    if (element && element.isComponent) {\n        const props = {\n            ...attrs,\n            children: (flatten(children) || []).filter(child => child !== null && child !== undefined)\n        };\n        return {\n            isComponent: true,\n            componentClass: element,\n            props\n        };\n    } else {\n        if (isFunction(element)) {\n            return element(attrs, ...children);\n        }\n        return {\n            name: element,\n            attrs: attrs || {},\n            children: (flatten(children) || []).filter(child => child !== null && child !== undefined),\n            isElem: true\n        };\n    }\n}\n\nfunction cleanAnGetNode(node) {\n    let realNode = node;\n    if (typeof node === 'string') {\n        realNode = document.getElementById(node);\n    }\n\n    while (realNode.firstChild) {\n        realNode.removeChild(realNode.firstChild);\n    }\n    return realNode;\n}\n\n/**\n * Render a component to the dom.\n * @param {string|Node} node the id or the node where the component must be rendered.\n * @param {Component} component the component to render.\n * @param {Store} store the store\n */\nexport function renderToDom(node, component, store = new Store()) {\n\n    renderComponents(node, [component], store);\n}\n\nfunction renderComponents(node, components, store = new Store()) {\n\n    const realNode = cleanAnGetNode(node);\n\n    const componentList = [];\n\n    flatten(components).filter(component => component !== undefined && component !== null)\n        .map(component => convertToNode(component, store, componentList))\n        .forEach(node => realNode.appendChild(node));\n\n    componentList.forEach(component => component.componentDidMount());\n\n    if (componentList.length) {\n        const mutationObserver = new MutationObserver(() => {\n            if (!document.body.contains(realNode)) {\n                mutationObserver.disconnect();\n                store.unsubscribeAll();\n            }\n            for (let index = store.componentsSubscribes.length - 1; index >= 0; index--) {\n                const component = store.componentsSubscribes[index];\n                if (component.component.node && !realNode.contains(component.component.node)) {\n                    component.subscribes.forEach(({event, id}) => store.unsubscribeByEventAndId(event, id));\n                    component.component.node = undefined;\n                    store.componentsSubscribes.splice(index, 1);\n                }\n            }\n        });\n\n\n        mutationObserver.observe(document.body, {childList: true, subtree: true});\n    }\n}\n\n/**\n * Render some elements into a string.\n * @param {Array} elements elements returned by {@link el} or primitive like string.\n * @return {string} html as a string.\n */\nexport function renderToString(...elements) {\n    return flatten(elements).map(el => {\n        if (!el.name) {\n            return '' + (el.__asHtml || el);\n        }\n        const attributes = Object.keys(el.attrs)\n            .filter(attribute => !attribute.startsWith('on') && el.attrs[attribute] !== undefined && attribute !== 'ref')\n            .map(attribute => {\n                const key = dasherize(attribute === 'className' ? 'class' : attribute);\n                let value = el.attrs[attribute];\n                if (key === 'style' && typeof value === 'object') {\n                    value = Object.keys(value)\n                        .map(key => '' + dasherize(key) + ':' + value[key])\n                        .join(';');\n                } else if (key === 'class' && typeof value === 'object') {\n                    value = Object.keys(value).filter(classValue => value[classValue])\n                        .map(dasherize)\n                        .join(' ');\n                }\n\n                return ` ${key}=\"${value}\"`\n            })\n            .join('');\n        const content = renderToString(...el.children);\n        return `<${el.name}${attributes}>${content}</${el.name}>`\n    }).join('');\n}\n\n\n/**\n * Render some elements into a node.\n * @param {string|Node} node the id or the node where the component must be rendered.\n * @param {Array} elements elements returned by {@link el} or primitive like string.\n */\nexport function renderTo(node, ...elements) {\n    renderComponents(node, elements)\n}\n"
   },
   {
     "__docId__": 34,
@@ -956,6 +956,44 @@
     "kind": "function",
     "static": true,
     "variation": null,
+    "name": "renderComponents",
+    "memberof": "src/renderer.js",
+    "longname": "src/renderer.js~renderComponents",
+    "access": null,
+    "export": false,
+    "importPath": "simpledom-component",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 60,
+    "undocument": true,
+    "params": [
+      {
+        "name": "node",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "components",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "store",
+        "optional": true,
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "generator": false
+  },
+  {
+    "__docId__": 38,
+    "kind": "function",
+    "static": true,
+    "variation": null,
     "name": "renderToString",
     "memberof": "src/renderer.js",
     "longname": "src/renderer.js~renderToString",
@@ -964,7 +1002,7 @@
     "importPath": "simpledom-component",
     "importStyle": "{renderToString}",
     "description": "Render some elements into a string.",
-    "lineNumber": 93,
+    "lineNumber": 98,
     "params": [
       {
         "nullable": null,
@@ -988,7 +1026,7 @@
     "generator": false
   },
   {
-    "__docId__": 38,
+    "__docId__": 39,
     "kind": "function",
     "static": true,
     "variation": null,
@@ -1000,7 +1038,7 @@
     "importPath": "simpledom-component",
     "importStyle": "{renderTo}",
     "description": "Render some elements into a node.",
-    "lineNumber": 127,
+    "lineNumber": 132,
     "params": [
       {
         "nullable": null,
@@ -1027,7 +1065,7 @@
     "generator": false
   },
   {
-    "__docId__": 40,
+    "__docId__": 41,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1040,7 +1078,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 41,
+    "__docId__": 42,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1053,7 +1091,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 42,
+    "__docId__": 43,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1066,7 +1104,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 43,
+    "__docId__": 44,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1079,7 +1117,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 44,
+    "__docId__": 45,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1092,7 +1130,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 45,
+    "__docId__": 46,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1105,7 +1143,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 46,
+    "__docId__": 47,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1118,7 +1156,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 47,
+    "__docId__": 48,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1131,7 +1169,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 48,
+    "__docId__": 49,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1144,7 +1182,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 49,
+    "__docId__": 50,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1157,7 +1195,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 50,
+    "__docId__": 51,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1170,7 +1208,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 51,
+    "__docId__": 52,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1183,7 +1221,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 52,
+    "__docId__": 53,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1196,7 +1234,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 53,
+    "__docId__": 54,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1209,7 +1247,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 54,
+    "__docId__": 55,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1222,7 +1260,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 55,
+    "__docId__": 56,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1235,7 +1273,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 56,
+    "__docId__": 57,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1248,7 +1286,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 57,
+    "__docId__": 58,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1261,7 +1299,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 58,
+    "__docId__": 59,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1274,7 +1312,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 59,
+    "__docId__": 60,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1287,7 +1325,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 60,
+    "__docId__": 61,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1300,7 +1338,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 61,
+    "__docId__": 62,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1313,7 +1351,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 62,
+    "__docId__": 63,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1326,7 +1364,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 63,
+    "__docId__": 64,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1339,7 +1377,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 64,
+    "__docId__": 65,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1352,7 +1390,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 65,
+    "__docId__": 66,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1365,7 +1403,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 66,
+    "__docId__": 67,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1378,7 +1416,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 67,
+    "__docId__": 68,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1391,7 +1429,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 68,
+    "__docId__": 69,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1404,7 +1442,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 69,
+    "__docId__": 70,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1417,7 +1455,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 70,
+    "__docId__": 71,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1430,7 +1468,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 71,
+    "__docId__": 72,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1443,7 +1481,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 72,
+    "__docId__": 73,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1456,7 +1494,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 73,
+    "__docId__": 74,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1469,7 +1507,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 74,
+    "__docId__": 75,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1482,7 +1520,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 75,
+    "__docId__": 76,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1495,7 +1533,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 76,
+    "__docId__": 77,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1508,7 +1546,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 77,
+    "__docId__": 78,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1521,7 +1559,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 78,
+    "__docId__": 79,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1534,7 +1572,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 79,
+    "__docId__": 80,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1547,7 +1585,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 80,
+    "__docId__": 81,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1560,7 +1598,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 81,
+    "__docId__": 82,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1573,7 +1611,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 82,
+    "__docId__": 83,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1586,7 +1624,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 83,
+    "__docId__": 84,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1599,7 +1637,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 84,
+    "__docId__": 85,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1612,7 +1650,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 85,
+    "__docId__": 86,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1625,7 +1663,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 86,
+    "__docId__": 87,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1638,7 +1676,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 88,
+    "__docId__": 89,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1651,7 +1689,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 89,
+    "__docId__": 90,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1664,7 +1702,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 90,
+    "__docId__": 91,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1677,7 +1715,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 91,
+    "__docId__": 92,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1690,7 +1728,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 92,
+    "__docId__": 93,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1703,7 +1741,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 93,
+    "__docId__": 94,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1716,7 +1754,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 94,
+    "__docId__": 95,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1729,7 +1767,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 95,
+    "__docId__": 96,
     "kind": "external",
     "static": true,
     "variation": null,

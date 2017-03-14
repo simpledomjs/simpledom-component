@@ -100,13 +100,18 @@ function cleanAnGetNode(node) {
  */
 export function renderToDom(node, component, store = new Store()) {
 
+    renderComponents(node, [component], store);
+}
+
+function renderComponents(node, components, store = new Store()) {
+
     const realNode = cleanAnGetNode(node);
 
     const componentList = [];
 
-    const convertedNode = convertToNode(component, store, componentList);
-
-    realNode.appendChild(convertedNode);
+    flatten(components).filter(component =&gt; component !== undefined &amp;&amp; component !== null)
+        .map(component =&gt; convertToNode(component, store, componentList))
+        .forEach(node =&gt; realNode.appendChild(node));
 
     componentList.forEach(component =&gt; component.componentDidMount());
 
@@ -171,10 +176,7 @@ export function renderToString(...elements) {
  * @param {Array} elements elements returned by {@link el} or primitive like string.
  */
 export function renderTo(node, ...elements) {
-    const realNode = cleanAnGetNode(node);
-
-    flatten(elements).filter(element =&gt; element !== undefined &amp;&amp; element !== null).map(convertToNode)
-        .forEach(node =&gt; realNode.appendChild(node));
+    renderComponents(node, elements)
 }
 </code></pre>
 
