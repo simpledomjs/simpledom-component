@@ -54,13 +54,18 @@ function cleanAnGetNode(node) {
  */
 export function renderToDom(node, component, store = new Store()) {
 
+    renderComponents(node, [component], store);
+}
+
+function renderComponents(node, components, store = new Store()) {
+
     const realNode = cleanAnGetNode(node);
 
     const componentList = [];
 
-    const convertedNode = convertToNode(component, store, componentList);
-
-    realNode.appendChild(convertedNode);
+    flatten(components).filter(component => component !== undefined && component !== null)
+        .map(component => convertToNode(component, store, componentList))
+        .forEach(node => realNode.appendChild(node));
 
     componentList.forEach(component => component.componentDidMount());
 
@@ -125,8 +130,5 @@ export function renderToString(...elements) {
  * @param {Array} elements elements returned by {@link el} or primitive like string.
  */
 export function renderTo(node, ...elements) {
-    const realNode = cleanAnGetNode(node);
-
-    flatten(elements).filter(element => element !== undefined && element !== null).map(convertToNode)
-        .forEach(node => realNode.appendChild(node));
+    renderComponents(node, elements)
 }
