@@ -14,6 +14,7 @@ export function updateAttrs(node, element) {
                 if (key === 'className') {
                     key = 'class';
                 }
+                key = dasherize(key);
                 if (key === 'style' && Object.prototype.toString.call(value) == '[object Object]') {
                     for (const styleKey in value) {
                         if (value.hasOwnProperty(styleKey)) {
