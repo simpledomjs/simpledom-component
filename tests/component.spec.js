@@ -141,7 +141,7 @@ describe('SimpleDom component API', () => {
 
 
 
-    it('Un simple reactive component with SimpleDom.renderTo', () => {
+    it('A simple reactive component with SimpleDom.renderTo', () => {
         cleanContainer();
 
 
@@ -166,6 +166,40 @@ describe('SimpleDom component API', () => {
 
         expect(document.getElementById('container').contains(buttonNode)).to.be.true;
         expect(document.getElementById('container').contains(counterNode)).to.be.false;
+
+    });
+
+    it('A test with ref to upper level', () => {
+
+        cleanContainer();
+
+        class TestRef extends SimpleDom.Component {
+
+            eventsToSubscribe() {
+                return ['TEST']
+            }
+
+            componentDidMount() {
+                this.div.querySelector('h1').innerText = 'ref';
+            }
+
+            render() {
+                return <div ref={ref => this.div = ref}>
+                    <h1>test</h1>
+                </div>
+            }
+
+        }
+
+        SimpleDom.renderTo(
+            'container',
+            <div>
+                <TestRef/>
+            </div>
+        );
+
+        expect(document.getElementById('container').innerHTML).to.be.equal('<div><div><h1>ref</h1></div></div>');
+
 
     })
 

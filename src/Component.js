@@ -142,7 +142,11 @@ export class Component {
             while (firstSimpleDomChild && !firstSimpleDomChild.isElem) {
                 firstSimpleDomChild = firstSimpleDomChild.children && firstSimpleDomChild.children[0];
             }
-            firstSimpleDomChild.attrs.ref = node => this.nodeRefHandler(node);
+            let oldRef = firstSimpleDomChild.attrs.ref;
+            firstSimpleDomChild.attrs.ref = node => {
+                oldRef && oldRef(node);
+                this.nodeRefHandler(node);
+            };
         }
         return result;
     }
