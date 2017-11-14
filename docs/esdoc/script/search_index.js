@@ -414,6 +414,12 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
+    "src/component.js~component#otherref",
+    "class/src/Component.js~Component.html#instance-member-otherRef",
+    "src/Component.js~Component#otherRef",
+    "member"
+  ],
+  [
     "src/component.js~component#props",
     "class/src/Component.js~Component.html#instance-member-props",
     "src/Component.js~Component#props",
@@ -423,6 +429,12 @@ window.esdocSearchIndex = [
     "src/component.js~component#reacttochangestate",
     "class/src/Component.js~Component.html#instance-method-reactToChangeState",
     "src/Component.js~Component#reactToChangeState",
+    "method"
+  ],
+  [
+    "src/component.js~component#refresh",
+    "class/src/Component.js~Component.html#instance-method-refresh",
+    "src/Component.js~Component#refresh",
     "method"
   ],
   [

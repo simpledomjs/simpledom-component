@@ -1,6 +1,6 @@
 {
   "name": "simpledom-component",
-  "version": "0.5.7",
+  "version": "0.5.11",
   "description": "Librairie orientée composant s'appuyant sur SimpleDom.js",
   "author": {
     "name": "Yan Bonnel",

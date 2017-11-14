@@ -111,6 +111,28 @@ export class Component {
          * @type {Node}
          */
         this.node = node;
+        if (this.otherRef) {
+            this.otherRef(node);
+        }
+    }
+
+    /**
+     * Method to call to refresh the component without the use of the store.
+     * Useful for internal state with this.
+     */
+    refresh() {
+        const componentList = [];
+        const oldNode = this.node;
+        this.node = null;
+        let newNode = convertToNode(this.renderComponent(), this.store, componentList);
+        if (newNode === undefined &amp;&amp; newNode === null) {
+            oldNode.parentNode.removeChild(oldNode);
+            this.componentDidMount();
+            return;
+        }
+        oldNode.parentNode.replaceChild(newNode, oldNode);
+
+        componentList.forEach(component =&gt; component.componentDidMount());
     }
 
     /**
@@ -125,18 +147,7 @@ export class Component {
             return;
         }
 
-        const componentList = [];
-        const oldNode = this.node;
-        this.node = null;
-        let newNode = convertToNode(this.renderComponent(), this.store, componentList);
-        if (newNode === undefined &amp;&amp; newNode === null) {
-            oldNode.parentNode.removeChild(oldNode);
-            this.componentDidMount();
-            return;
-        }
-        oldNode.parentNode.replaceChild(newNode, oldNode);
-
-        componentList.forEach(component =&gt; component.componentDidMount());
+        this.refresh();
         this.componentDidMount();
     }
 
@@ -169,31 +180,33 @@ export class Component {
      * Method use internally to render a component.
      * @return {Component|Object} This return a component or result of SimpleDom.el.
      */
-    renderComponent() {
+    renderComponent(otherRef) {
         const result = this.render();
-        if (this.eventsToSubscribe() &amp;&amp; this.eventsToSubscribe().length &gt; 0) {
-            if (result === undefined || result === null) {
-                return el(&apos;div&apos;,
-                    {
-                        ref: node =&gt; this.nodeRefHandler(node),
-                        style: {
-                            width: 0,
-                            height: 0
-                        }
+        this.otherRef = otherRef;
+        if (result === undefined || result === null) {
+            return el(&apos;div&apos;,
+                {
+                    ref: node =&gt; this.nodeRefHandler(node),
+                    style: {
+                        width: 0,
+                        height: 0
                     }
-                );
-            }
+                }
+            );
+        }
 
-            let firstSimpleDomChild = result;
-            while (firstSimpleDomChild &amp;&amp; !firstSimpleDomChild.isElem) {
-                firstSimpleDomChild = firstSimpleDomChild.children &amp;&amp; firstSimpleDomChild.children[0];
-            }
-            let oldRef = firstSimpleDomChild.attrs.ref;
-            firstSimpleDomChild.attrs.ref = node =&gt; {
+        if (result.isElem) {
+            let oldRef = result.attrs.ref;
+            result.attrs.ref = node =&gt; {
                 oldRef &amp;&amp; oldRef(node);
                 this.nodeRefHandler(node);
             };
+        } else if (result.isComponent) {
+            result.otherRef = node =&gt; this.nodeRefHandler(node);
+        } else {
+            console.error(&apos;Unkown result type for a component&apos;, result);
         }
+
         return result;
     }
 

@@ -23,6 +23,10 @@
     "id": "counter",
     "title": "A simple counter with +1 and -1",
     "description": "Let's try to use store and events to update a component with a persistant state"
+  },
+  {
+    "id": "internalState",
+    "title": "A simple TODO List with no store, only internal state",
+    "description": "Let's try to not use the store :)"
   }
-
 ]

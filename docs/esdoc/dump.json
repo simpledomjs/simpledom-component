@@ -10,7 +10,7 @@
     "access": null,
     "description": null,
     "lineNumber": 1,
-    "content": "\nimport { el } from './renderer';\nimport { convertToNode } from './converter';\n\n/**\n * Class for a component.\n * ```\n *   class HelloWorldComponent extends Component {\n *      render() {\n *          return (\n *              <h1>{this.props.message}</h1>\n *          );\n *      }\n *   }\n *\n *   renderToDom('container', <HelloWorldComponent messsage=\"Hello World!\"/>);\n * ```\n */\nexport class Component {\n    static isComponent = true;\n\n    /**\n     * The state of the current store\n     * @type {Object}\n     */\n    get state() {\n        return this.store.state;\n    }\n\n    /**\n     * Constructor of a component.\n     * @param {Object} props the props (attributes pass to dom node + children)\n     * @param {Store} store the store.\n     */\n    constructor(props, store = undefined) {\n        /**\n         * The props  (attributes pass to dom node + children).\n         * @type {Object}\n         */\n        this.props = props;\n        /**\n         * The store share between all components.\n         * @type {Store}\n         */\n        this.store = store;\n\n        Object.getOwnPropertyNames(Object.getPrototypeOf(this))\n            .filter(name => name !== 'constructor')\n            .filter(name => this[name] instanceof Function)\n            .forEach(name => this[name] = this[name].bind(this));\n\n        for (const event of this.eventsToSubscribe()) {\n            this.store.subscribe(event, this.reactToChangeState.bind(this), this);\n        }\n    }\n\n\n    /**\n     * Do not touch :)\n     * @param {Node} node parent node of the component.\n     */\n    nodeRefHandler(node) {\n        /**\n         * Parent node of the component.\n         * @type {Node}\n         */\n        this.node = node;\n    }\n\n    /**\n     * Internally method which is called when an event of {@link eventsToSubscribe}\n     * You can override the method if you want a specific\n     * @param {string} event event received in the store.\n     * @param {Object} newState the new state.\n     * @param {Object} oldState the old state.\n     */\n    reactToChangeState(event, newState, oldState) {\n        if (!this.mustRefresh(oldState, newState) || !this.node) {\n            return;\n        }\n\n        const componentList = [];\n        const oldNode = this.node;\n        this.node = null;\n        let newNode = convertToNode(this.renderComponent(), this.store, componentList);\n        if (newNode === undefined && newNode === null) {\n            oldNode.parentNode.removeChild(oldNode);\n            this.componentDidMount();\n            return;\n        }\n        oldNode.parentNode.replaceChild(newNode, oldNode);\n\n        componentList.forEach(component => component.componentDidMount());\n        this.componentDidMount();\n    }\n\n    /**\n     * Method to implement to react when an event is send to {@link Store}\n     * @return {Array} array of string events to react.\n     */\n    eventsToSubscribe() {\n        return [];\n    }\n\n\n    /**\n     * Return false to avoid call to render on an event.\n     * @param {Object} oldState the old state.\n     * @param {Object} newState the new state.\n     */\n    mustRefresh(oldState, newState) {\n        return true;\n    }\n\n    /**\n     * Method called after rendered into DOM.\n     * @abstract\n     */\n    componentDidMount() {\n    }\n\n    /**\n     * Method use internally to render a component.\n     * @return {Component|Object} This return a component or result of SimpleDom.el.\n     */\n    renderComponent() {\n        const result = this.render();\n        if (this.eventsToSubscribe() && this.eventsToSubscribe().length > 0) {\n            if (result === undefined || result === null) {\n                return el('div',\n                    {\n                        ref: node => this.nodeRefHandler(node),\n                        style: {\n                            width: 0,\n                            height: 0\n                        }\n                    }\n                );\n            }\n\n            let firstSimpleDomChild = result;\n            while (firstSimpleDomChild && !firstSimpleDomChild.isElem) {\n                firstSimpleDomChild = firstSimpleDomChild.children && firstSimpleDomChild.children[0];\n            }\n            let oldRef = firstSimpleDomChild.attrs.ref;\n            firstSimpleDomChild.attrs.ref = node => {\n                oldRef && oldRef(node);\n                this.nodeRefHandler(node);\n            };\n        }\n        return result;\n    }\n\n    /**\n     * Method to implement to render something.\n     * @abstract\n     * @return {Component|Object} This return a component or result of {@link el}.\n     */\n    render() {\n        return undefined;\n    }\n\n}\n"
+    "content": "\nimport { el } from './renderer';\nimport { convertToNode } from './converter';\n\n/**\n * Class for a component.\n * ```\n *   class HelloWorldComponent extends Component {\n *      render() {\n *          return (\n *              <h1>{this.props.message}</h1>\n *          );\n *      }\n *   }\n *\n *   renderToDom('container', <HelloWorldComponent messsage=\"Hello World!\"/>);\n * ```\n */\nexport class Component {\n    static isComponent = true;\n\n    /**\n     * The state of the current store\n     * @type {Object}\n     */\n    get state() {\n        return this.store.state;\n    }\n\n    /**\n     * Constructor of a component.\n     * @param {Object} props the props (attributes pass to dom node + children)\n     * @param {Store} store the store.\n     */\n    constructor(props, store = undefined) {\n        /**\n         * The props  (attributes pass to dom node + children).\n         * @type {Object}\n         */\n        this.props = props;\n        /**\n         * The store share between all components.\n         * @type {Store}\n         */\n        this.store = store;\n\n        Object.getOwnPropertyNames(Object.getPrototypeOf(this))\n            .filter(name => name !== 'constructor')\n            .filter(name => this[name] instanceof Function)\n            .forEach(name => this[name] = this[name].bind(this));\n\n        for (const event of this.eventsToSubscribe()) {\n            this.store.subscribe(event, this.reactToChangeState.bind(this), this);\n        }\n    }\n\n\n    /**\n     * Do not touch :)\n     * @param {Node} node parent node of the component.\n     */\n    nodeRefHandler(node) {\n        /**\n         * Parent node of the component.\n         * @type {Node}\n         */\n        this.node = node;\n        if (this.otherRef) {\n            this.otherRef(node);\n        }\n    }\n\n    /**\n     * Method to call to refresh the component without the use of the store.\n     * Useful for internal state with this.\n     */\n    refresh() {\n        const componentList = [];\n        const oldNode = this.node;\n        this.node = null;\n        let newNode = convertToNode(this.renderComponent(), this.store, componentList);\n        if (newNode === undefined && newNode === null) {\n            oldNode.parentNode.removeChild(oldNode);\n            this.componentDidMount();\n            return;\n        }\n        oldNode.parentNode.replaceChild(newNode, oldNode);\n\n        componentList.forEach(component => component.componentDidMount());\n    }\n\n    /**\n     * Internally method which is called when an event of {@link eventsToSubscribe}\n     * You can override the method if you want a specific\n     * @param {string} event event received in the store.\n     * @param {Object} newState the new state.\n     * @param {Object} oldState the old state.\n     */\n    reactToChangeState(event, newState, oldState) {\n        if (!this.mustRefresh(oldState, newState) || !this.node) {\n            return;\n        }\n\n        this.refresh();\n        this.componentDidMount();\n    }\n\n    /**\n     * Method to implement to react when an event is send to {@link Store}\n     * @return {Array} array of string events to react.\n     */\n    eventsToSubscribe() {\n        return [];\n    }\n\n\n    /**\n     * Return false to avoid call to render on an event.\n     * @param {Object} oldState the old state.\n     * @param {Object} newState the new state.\n     */\n    mustRefresh(oldState, newState) {\n        return true;\n    }\n\n    /**\n     * Method called after rendered into DOM.\n     * @abstract\n     */\n    componentDidMount() {\n    }\n\n    /**\n     * Method use internally to render a component.\n     * @return {Component|Object} This return a component or result of SimpleDom.el.\n     */\n    renderComponent(otherRef) {\n        const result = this.render();\n        this.otherRef = otherRef;\n        if (result === undefined || result === null) {\n            return el('div',\n                {\n                    ref: node => this.nodeRefHandler(node),\n                    style: {\n                        width: 0,\n                        height: 0\n                    }\n                }\n            );\n        }\n\n        if (result.isElem) {\n            let oldRef = result.attrs.ref;\n            result.attrs.ref = node => {\n                oldRef && oldRef(node);\n                this.nodeRefHandler(node);\n            };\n        } else if (result.isComponent) {\n            result.otherRef = node => this.nodeRefHandler(node);\n        } else {\n            console.error('Unkown result type for a component', result);\n        }\n\n        return result;\n    }\n\n    /**\n     * Method to implement to render something.\n     * @abstract\n     * @return {Component|Object} This return a component or result of {@link el}.\n     */\n    render() {\n        return undefined;\n    }\n\n}\n"
   },
   {
     "__docId__": 1,
@@ -174,12 +174,44 @@
     "kind": "method",
     "static": false,
     "variation": null,
+    "name": "refresh",
+    "memberof": "src/Component.js~Component",
+    "longname": "src/Component.js~Component#refresh",
+    "access": null,
+    "description": "Method to call to refresh the component without the use of the store.\nUseful for internal state with this.",
+    "lineNumber": 77,
+    "params": [],
+    "generator": false
+  },
+  {
+    "__docId__": 9,
+    "kind": "member",
+    "static": false,
+    "variation": null,
+    "name": "node",
+    "memberof": "src/Component.js~Component",
+    "longname": "src/Component.js~Component#node",
+    "access": null,
+    "description": null,
+    "lineNumber": 80,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 10,
+    "kind": "method",
+    "static": false,
+    "variation": null,
     "name": "reactToChangeState",
     "memberof": "src/Component.js~Component",
     "longname": "src/Component.js~Component#reactToChangeState",
     "access": null,
     "description": "Internally method which is called when an event of {@link eventsToSubscribe}\nYou can override the method if you want a specific",
-    "lineNumber": 77,
+    "lineNumber": 99,
     "params": [
       {
         "nullable": null,
@@ -215,25 +247,7 @@
     "generator": false
   },
   {
-    "__docId__": 9,
-    "kind": "member",
-    "static": false,
-    "variation": null,
-    "name": "node",
-    "memberof": "src/Component.js~Component",
-    "longname": "src/Component.js~Component#node",
-    "access": null,
-    "description": null,
-    "lineNumber": 84,
-    "undocument": true,
-    "type": {
-      "types": [
-        "*"
-      ]
-    }
-  },
-  {
-    "__docId__": 10,
+    "__docId__": 11,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -242,7 +256,7 @@
     "longname": "src/Component.js~Component#eventsToSubscribe",
     "access": null,
     "description": "Method to implement to react when an event is send to {@link Store}",
-    "lineNumber": 101,
+    "lineNumber": 112,
     "params": [],
     "return": {
       "nullable": null,
@@ -255,7 +269,7 @@
     "generator": false
   },
   {
-    "__docId__": 11,
+    "__docId__": 12,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -264,7 +278,7 @@
     "longname": "src/Component.js~Component#mustRefresh",
     "access": null,
     "description": "Return false to avoid call to render on an event.",
-    "lineNumber": 111,
+    "lineNumber": 122,
     "params": [
       {
         "nullable": null,
@@ -295,7 +309,7 @@
     "generator": false
   },
   {
-    "__docId__": 12,
+    "__docId__": 13,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -304,13 +318,13 @@
     "longname": "src/Component.js~Component#componentDidMount",
     "access": null,
     "description": "Method called after rendered into DOM.",
-    "lineNumber": 119,
+    "lineNumber": 130,
     "params": [],
     "abstract": true,
     "generator": false
   },
   {
-    "__docId__": 13,
+    "__docId__": 14,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -319,8 +333,15 @@
     "longname": "src/Component.js~Component#renderComponent",
     "access": null,
     "description": "Method use internally to render a component.",
-    "lineNumber": 126,
-    "params": [],
+    "lineNumber": 137,
+    "params": [
+      {
+        "name": "otherRef",
+        "types": [
+          "*"
+        ]
+      }
+    ],
     "return": {
       "nullable": null,
       "types": [
@@ -333,7 +354,25 @@
     "generator": false
   },
   {
-    "__docId__": 14,
+    "__docId__": 15,
+    "kind": "member",
+    "static": false,
+    "variation": null,
+    "name": "otherRef",
+    "memberof": "src/Component.js~Component",
+    "longname": "src/Component.js~Component#otherRef",
+    "access": null,
+    "description": null,
+    "lineNumber": 139,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 16,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -342,7 +381,7 @@
     "longname": "src/Component.js~Component#render",
     "access": null,
     "description": "Method to implement to render something.",
-    "lineNumber": 159,
+    "lineNumber": 172,
     "params": [],
     "return": {
       "nullable": null,
@@ -357,7 +396,7 @@
     "generator": false
   },
   {
-    "__docId__": 15,
+    "__docId__": 17,
     "kind": "file",
     "static": true,
     "variation": null,
@@ -370,7 +409,7 @@
     "content": "\n\nlet generatedId = 1;\n\nfunction generateId() {\n    return generatedId++;\n}\n\n/**\n * A simple Store which receive all state changes with an event (string).\n */\nexport class Store {\n    /**\n     * The constructor.\n     * @param {object} initialeState the initial state.\n     */\n    constructor(initialeState = {}) {\n        /**\n         * The state of store.\n         * @type {object}\n         */\n        this.state = initialeState;\n        /**\n         * Don't touch :)\n         * @type {Object}\n         */\n        this.subscribers = {};\n\n        /**\n         * Don't touch :)\n         * @type {Array}\n         */\n        this.componentsSubscribes = [];\n    }\n\n    /**\n     * Method to call to change the state.\n     * @param {object} newState the new state (you can put only attributes changed).\n     * @param {...string} events events to the origin of the state change.\n     */\n    updateState(newState, ...events) {\n        const oldState = this.state;\n        this.state = {...this.state, ...newState};\n\n        const eventsToPropagate = events.concat('*');\n\n        let index = eventsToPropagate.length;\n        while (index--) {\n            const event = eventsToPropagate[index];\n            if (this.subscribers[event]) {\n                for (const id in this.subscribers[event]) {\n                    if (this.subscribers[event].hasOwnProperty(id)) {\n                        this.subscribers[event][id](event, this.state, oldState);\n                    }\n                }\n            }\n        }\n    }\n\n    /**\n     * Method to call to subscribe to an event.\n     *\n     * There is a special event that catches all events : '*'.\n     *\n     * @param {string} event event to subscribe.\n     * @param {function(event: string, state: object, oldState:object)} callback the callback called when receive the event.\n     * @param {Component} component use internally to unsubcribe component when node disappear\n     * @return {number} the id to put in param of {@link unsubscribe} to unsubscribe.\n     */\n    subscribe(event, callback = state => {}, component) {\n        if (!this.subscribers[event]) {\n            this.subscribers[event] = {};\n        }\n        const id = generateId();\n        this.subscribers[event][id] = callback;\n\n        if (component) {\n            let componentWrapper = undefined;\n            for (const componentAlreadySubcribes of this.componentsSubscribes) {\n                if (componentAlreadySubcribes.component === component) {\n                    componentWrapper = componentAlreadySubcribes;\n                    break;\n                }\n            }\n            if (!componentWrapper) {\n                componentWrapper = {\n                    component,\n                    subscribes: []\n                };\n                this.componentsSubscribes.push(componentWrapper);\n            }\n            componentWrapper.subscribes.push({\n                event,\n                id\n            });\n        }\n\n        return id;\n    }\n\n    /**\n     * Unsubscribe.\n     * @param {number} id id received at {@link subscribe}\n     */\n    unsubsribe(id) {\n        for (let event of Object.keys(this.subscribers)) {\n            if (this.subscribers[event][id]) {\n                delete this.subscribers[event][id];\n            }\n        }\n    }\n\n    /**\n     * Unsubcribe all subcribers.\n     */\n    unsubscribeAll() {\n        this.subscribers = {};\n        this.componentsSubscribes = [];\n    }\n\n\n\n    /**\n     * Unsubscribe.\n     * @param {string} event event sent to {@link subscribe}\n     * @param {number} id id received at {@link subscribe}\n     */\n    unsubscribeByEventAndId(event, id) {\n        if (this.subscribers[event][id]) {\n            delete this.subscribers[event][id];\n        }\n    }\n}\n"
   },
   {
-    "__docId__": 16,
+    "__docId__": 18,
     "kind": "variable",
     "static": true,
     "variation": null,
@@ -391,7 +430,7 @@
     }
   },
   {
-    "__docId__": 17,
+    "__docId__": 19,
     "kind": "function",
     "static": true,
     "variation": null,
@@ -414,7 +453,7 @@
     "generator": false
   },
   {
-    "__docId__": 18,
+    "__docId__": 20,
     "kind": "class",
     "static": true,
     "variation": null,
@@ -430,7 +469,7 @@
     "interface": false
   },
   {
-    "__docId__": 19,
+    "__docId__": 21,
     "kind": "constructor",
     "static": false,
     "variation": null,
@@ -455,7 +494,7 @@
     "generator": false
   },
   {
-    "__docId__": 20,
+    "__docId__": 22,
     "kind": "member",
     "static": false,
     "variation": null,
@@ -475,7 +514,7 @@
     }
   },
   {
-    "__docId__": 21,
+    "__docId__": 23,
     "kind": "member",
     "static": false,
     "variation": null,
@@ -495,7 +534,7 @@
     }
   },
   {
-    "__docId__": 22,
+    "__docId__": 24,
     "kind": "member",
     "static": false,
     "variation": null,
@@ -515,7 +554,7 @@
     }
   },
   {
-    "__docId__": 23,
+    "__docId__": 25,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -550,7 +589,7 @@
     "generator": false
   },
   {
-    "__docId__": 24,
+    "__docId__": 26,
     "kind": "member",
     "static": false,
     "variation": null,
@@ -568,7 +607,7 @@
     }
   },
   {
-    "__docId__": 25,
+    "__docId__": 27,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -621,7 +660,7 @@
     "generator": false
   },
   {
-    "__docId__": 26,
+    "__docId__": 28,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -646,7 +685,7 @@
     "generator": false
   },
   {
-    "__docId__": 27,
+    "__docId__": 29,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -660,7 +699,7 @@
     "generator": false
   },
   {
-    "__docId__": 28,
+    "__docId__": 30,
     "kind": "member",
     "static": false,
     "variation": null,
@@ -678,7 +717,7 @@
     }
   },
   {
-    "__docId__": 29,
+    "__docId__": 31,
     "kind": "member",
     "static": false,
     "variation": null,
@@ -696,7 +735,7 @@
     }
   },
   {
-    "__docId__": 30,
+    "__docId__": 32,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -731,7 +770,7 @@
     "generator": false
   },
   {
-    "__docId__": 31,
+    "__docId__": 33,
     "kind": "file",
     "static": true,
     "variation": null,
@@ -744,7 +783,7 @@
     "content": "import { Component } from './Component';\nimport { Store } from './Store';\nimport { el, renderToDom, renderTo, renderToString } from './renderer';\nimport { isFunction } from  './util';\n\n/**\n * Can be used as a simple if/else statement info your jsx :\n * ```\n *  SimpleDom.renderTo('container',\n *      <div>\n *          SimpleDom.predicate(myCondition,\n *              <h1>myCondition is true</h1>,\n *              <h1>myCondition is false</h1>\n *          )\n *      </div>\n *  );\n * ```\n * @param {boolean|function():boolean} cond condition to evaluate\n * @param {*} element element to return if cond is true (if it's a function, the result of the function is returned).\n * @param {*} elseElement element to return if cond is false (if it's a function, the result of the function is returned).\n * @return {*} element or elseElement depending of cond value.\n */\nexport function predicate(cond, element, elseElement) {\n    const isTrue = isFunction(cond) ? cond() : cond;\n    if (isTrue) {\n        return isFunction(element) ? element() : element;\n    }\n    return isFunction(elseElement) ? elseElement() : elseElement;\n}\n\nexports.Component = Component;\nexports.Store = Store;\nexports.el = el;\nexports.renderToDom = renderToDom;\nexports.renderTo = renderTo;\nexports.renderToString = renderToString;\n"
   },
   {
-    "__docId__": 32,
+    "__docId__": 34,
     "kind": "function",
     "static": true,
     "variation": null,
@@ -801,7 +840,7 @@
     "generator": false
   },
   {
-    "__docId__": 33,
+    "__docId__": 35,
     "kind": "file",
     "static": true,
     "variation": null,
@@ -814,7 +853,7 @@
     "content": "import { convertToNode } from './converter';\nimport { flatten, dasherize, isFunction } from './util';\nimport { Store } from './Store';\n\n\n/**\n * JSX factory function to create an object representing a dom node. Designed to be used with a JSX transpiler.\n * @param {Object|Component|string|function} element the name of the tag, or a {@link Component}.\n * @param {Object} attrs properties of the node, a plain old JS object. Not optional, if no value, put empty object.\n * @param {Array} children the children of the node, a vararg\n * @return {Object} an object representing a dom node.\n */\nexport function el(element, attrs, ...children) {\n    if (element && element.isComponent) {\n        const props = {\n            ...attrs,\n            children: (flatten(children) || []).filter(child => child !== null && child !== undefined)\n        };\n        return {\n            isComponent: true,\n            componentClass: element,\n            props\n        };\n    } else {\n        if (isFunction(element)) {\n            return element(attrs, ...children);\n        }\n        return {\n            name: element,\n            attrs: attrs || {},\n            children: (flatten(children) || []).filter(child => child !== null && child !== undefined),\n            isElem: true\n        };\n    }\n}\n\nfunction cleanAnGetNode(node) {\n    let realNode = node;\n    if (typeof node === 'string') {\n        realNode = document.getElementById(node);\n    }\n\n    while (realNode.firstChild) {\n        realNode.removeChild(realNode.firstChild);\n    }\n    return realNode;\n}\n\n/**\n * Render a component to the dom.\n * @param {string|Node} node the id or the node where the component must be rendered.\n * @param {Component} component the component to render.\n * @param {Store} store the store\n */\nexport function renderToDom(node, component, store = new Store()) {\n\n    renderComponents(node, [component], store);\n}\n\nfunction renderComponents(node, components, store = new Store()) {\n\n    const realNode = cleanAnGetNode(node);\n\n    const componentList = [];\n\n    flatten(components).filter(component => component !== undefined && component !== null)\n        .map(component => convertToNode(component, store, componentList))\n        .forEach(node => realNode.appendChild(node));\n\n    componentList.forEach(component => component.componentDidMount());\n\n    if (componentList.length) {\n        const mutationObserver = new MutationObserver(() => {\n            if (!document.body.contains(realNode)) {\n                mutationObserver.disconnect();\n                store.unsubscribeAll();\n            }\n            for (let index = store.componentsSubscribes.length - 1; index >= 0; index--) {\n                const component = store.componentsSubscribes[index];\n                if (component.component.node && !realNode.contains(component.component.node)) {\n                    component.subscribes.forEach(({event, id}) => store.unsubscribeByEventAndId(event, id));\n                    component.component.node = undefined;\n                    store.componentsSubscribes.splice(index, 1);\n                }\n            }\n        });\n\n\n        mutationObserver.observe(document.body, {childList: true, subtree: true});\n    }\n}\n\n/**\n * Render some elements into a string.\n * @param {Array} elements elements returned by {@link el} or primitive like string.\n * @return {string} html as a string.\n */\nexport function renderToString(...elements) {\n    return flatten(elements).map(el => {\n        if (!el.name) {\n            return '' + (el.__asHtml || el);\n        }\n        const attributes = Object.keys(el.attrs)\n            .filter(attribute => !attribute.startsWith('on') && el.attrs[attribute] !== undefined && attribute !== 'ref')\n            .map(attribute => {\n                const key = dasherize(attribute === 'className' ? 'class' : attribute);\n                let value = el.attrs[attribute];\n                if (key === 'style' && typeof value === 'object') {\n                    value = Object.keys(value)\n                        .map(key => '' + dasherize(key) + ':' + value[key])\n                        .join(';');\n                } else if (key === 'class' && typeof value === 'object') {\n                    value = Object.keys(value).filter(classValue => value[classValue])\n                        .map(dasherize)\n                        .join(' ');\n                }\n\n                return ` ${key}=\"${value}\"`\n            })\n            .join('');\n        const content = renderToString(...el.children);\n        return `<${el.name}${attributes}>${content}</${el.name}>`\n    }).join('');\n}\n\n\n/**\n * Render some elements into a node.\n * @param {string|Node} node the id or the node where the component must be rendered.\n * @param {Array} elements elements returned by {@link el} or primitive like string.\n */\nexport function renderTo(node, ...elements) {\n    renderComponents(node, elements)\n}\n"
   },
   {
-    "__docId__": 34,
+    "__docId__": 36,
     "kind": "function",
     "static": true,
     "variation": null,
@@ -873,7 +912,7 @@
     "generator": false
   },
   {
-    "__docId__": 35,
+    "__docId__": 37,
     "kind": "function",
     "static": true,
     "variation": null,
@@ -903,7 +942,7 @@
     "generator": false
   },
   {
-    "__docId__": 36,
+    "__docId__": 38,
     "kind": "function",
     "static": true,
     "variation": null,
@@ -952,7 +991,7 @@
     "generator": false
   },
   {
-    "__docId__": 37,
+    "__docId__": 39,
     "kind": "function",
     "static": true,
     "variation": null,
@@ -990,7 +1029,7 @@
     "generator": false
   },
   {
-    "__docId__": 38,
+    "__docId__": 40,
     "kind": "function",
     "static": true,
     "variation": null,
@@ -1026,7 +1065,7 @@
     "generator": false
   },
   {
-    "__docId__": 39,
+    "__docId__": 41,
     "kind": "function",
     "static": true,
     "variation": null,
@@ -1065,7 +1104,7 @@
     "generator": false
   },
   {
-    "__docId__": 41,
+    "__docId__": 43,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1078,7 +1117,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 42,
+    "__docId__": 44,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1091,7 +1130,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 43,
+    "__docId__": 45,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1104,7 +1143,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 44,
+    "__docId__": 46,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1117,7 +1156,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 45,
+    "__docId__": 47,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1130,7 +1169,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 46,
+    "__docId__": 48,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1143,7 +1182,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 47,
+    "__docId__": 49,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1156,7 +1195,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 48,
+    "__docId__": 50,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1169,7 +1208,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 49,
+    "__docId__": 51,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1182,7 +1221,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 50,
+    "__docId__": 52,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1195,7 +1234,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 51,
+    "__docId__": 53,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1208,7 +1247,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 52,
+    "__docId__": 54,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1221,7 +1260,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 53,
+    "__docId__": 55,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1234,7 +1273,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 54,
+    "__docId__": 56,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1247,7 +1286,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 55,
+    "__docId__": 57,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1260,7 +1299,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 56,
+    "__docId__": 58,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1273,7 +1312,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 57,
+    "__docId__": 59,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1286,7 +1325,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 58,
+    "__docId__": 60,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1299,7 +1338,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 59,
+    "__docId__": 61,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1312,7 +1351,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 60,
+    "__docId__": 62,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1325,7 +1364,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 61,
+    "__docId__": 63,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1338,7 +1377,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 62,
+    "__docId__": 64,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1351,7 +1390,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 63,
+    "__docId__": 65,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1364,7 +1403,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 64,
+    "__docId__": 66,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1377,7 +1416,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 65,
+    "__docId__": 67,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1390,7 +1429,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 66,
+    "__docId__": 68,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1403,7 +1442,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 67,
+    "__docId__": 69,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1416,7 +1455,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 68,
+    "__docId__": 70,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1429,7 +1468,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 69,
+    "__docId__": 71,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1442,7 +1481,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 70,
+    "__docId__": 72,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1455,7 +1494,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 71,
+    "__docId__": 73,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1468,7 +1507,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 72,
+    "__docId__": 74,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1481,7 +1520,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 73,
+    "__docId__": 75,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1494,7 +1533,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 74,
+    "__docId__": 76,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1507,7 +1546,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 75,
+    "__docId__": 77,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1520,7 +1559,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 76,
+    "__docId__": 78,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1533,7 +1572,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 77,
+    "__docId__": 79,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1546,7 +1585,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 78,
+    "__docId__": 80,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1559,7 +1598,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 79,
+    "__docId__": 81,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1572,7 +1611,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 80,
+    "__docId__": 82,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1585,7 +1624,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 81,
+    "__docId__": 83,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1598,7 +1637,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 82,
+    "__docId__": 84,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1611,7 +1650,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 83,
+    "__docId__": 85,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1624,7 +1663,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 84,
+    "__docId__": 86,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1637,7 +1676,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 85,
+    "__docId__": 87,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1650,7 +1689,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 86,
+    "__docId__": 88,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1663,7 +1702,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 87,
+    "__docId__": 89,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1676,7 +1715,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 89,
+    "__docId__": 91,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1689,7 +1728,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 90,
+    "__docId__": 92,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1702,7 +1741,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 91,
+    "__docId__": 93,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1715,7 +1754,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 92,
+    "__docId__": 94,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1728,7 +1767,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 93,
+    "__docId__": 95,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1741,7 +1780,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 94,
+    "__docId__": 96,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1754,7 +1793,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 95,
+    "__docId__": 97,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1767,7 +1806,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 96,
+    "__docId__": 98,
     "kind": "external",
     "static": true,
     "variation": null,
