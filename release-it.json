@@ -2,6 +2,7 @@
     "non-interactive": false,
     "verbose": true,
     "buildCommand": "npm run clean && npm run build",
+    "beforeStartCommand": "npm run clean && npm run build",
     "npm": {
         "publish": true
     },
