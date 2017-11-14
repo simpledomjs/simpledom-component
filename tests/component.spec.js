@@ -84,7 +84,7 @@ describe('SimpleDom component API', () => {
             </div>
         );
 
-        expect(document.getElementById('container').innerHTML).to.be.equal('<div><div></div></div>');
+        expect(document.getElementById('container').innerHTML).to.be.equal('<div><div></div><div style="width: 0px; height: 0px;"></div></div>');
 
     });
 
@@ -139,7 +139,47 @@ describe('SimpleDom component API', () => {
 
     })
 
+    class SimpleCounter extends SimpleDom.Component {
 
+        constructor(props, store) {
+            super(props, store);
+            this.counter = 0;
+        }
+
+        inc() {
+            this.counter++;
+            this.refresh();
+        }
+
+        render() {
+            return (
+                <div>
+                    <h1 id="counter-h1">{this.counter}</h1>
+                    <button id="inc-button" onClick={this.inc}>+1</button>
+                </div>
+            );
+        }
+    }
+
+    it('Un simple reactive component with internal state', () => {
+        cleanContainer();
+
+        SimpleDom.renderToDom(
+            'container',
+            <SimpleCounter/>
+        );
+
+        expect(document.getElementById('counter-h1').innerHTML).to.be.equal('0');
+
+        document.getElementById('inc-button').click();
+
+        expect(document.getElementById('counter-h1').innerHTML).to.be.equal('1');
+
+        document.getElementById('inc-button').click();
+
+        expect(document.getElementById('counter-h1').innerHTML).to.be.equal('2');
+
+    })
 
     it('A simple reactive component with SimpleDom.renderTo', () => {
         cleanContainer();
@@ -200,6 +240,45 @@ describe('SimpleDom component API', () => {
 
         expect(document.getElementById('container').innerHTML).to.be.equal('<div><div><h1>ref</h1></div></div>');
 
+
+    })
+
+
+
+    it('Test with multiple component inside component', () => {
+
+        class Component1 extends SimpleDom.Component {
+            render() {
+                return <div>{this.state.counter || 0}</div>;
+            }
+
+        }
+
+        class Component2 extends SimpleDom.Component {
+            render() {
+                return <Component1/>;
+            }
+        }
+
+        class Component3 extends SimpleDom.Component {
+            eventsToSubscribe() {
+                return ['EVENT'];
+            }
+
+            render() {
+                return <Component2/>;
+            }
+        }
+
+        cleanContainer();
+        const store = new SimpleDom.Store();
+        SimpleDom.renderToDom('container', <Component3/>, store);
+
+        expect(document.getElementById('container').innerHTML).to.be.equal('<div>0</div>');
+
+        store.updateState({counter: 1}, 'EVENT');
+
+        expect(document.getElementById('container').innerHTML).to.be.equal('<div>1</div>');
 
     })
 
