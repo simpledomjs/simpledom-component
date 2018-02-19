@@ -43,7 +43,7 @@ export function convertToNode(element, store, componentList) {
     if (element.isComponent) {
         let componentInstance = new element.componentClass({...element.props}, store);
         componentList.push(componentInstance);
-        return convertToNode(componentInstance.renderComponent(), store, componentList);
+        return convertToNode(componentInstance.renderComponent(element.otherRef), store, componentList);
     }
 
     if (!element.isElem) {
