@@ -52,6 +52,9 @@ export class Component {
         for (const event of this.eventsToSubscribe()) {
             this.store.subscribe(event, this.reactToChangeState.bind(this), this);
         }
+        if (this.componentDidUnmount) {
+            this.store.componentsToUnmount.push(this);
+        }
     }
 
 
@@ -101,6 +104,7 @@ export class Component {
             return;
         }
 
+        this.componentDidUnmount && this.componentDidUnmount();  
         this.refresh();
         this.componentDidMount();
     }

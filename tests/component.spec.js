@@ -241,6 +241,127 @@ describe('SimpleDom component API', () => {
         expect(document.getElementById('container').innerHTML).to.be.equal('<div><div><h1>ref</h1></div></div>');
 
 
+    });
+
+
+
+    it('A test for unmounting', (done) => {
+        
+        function timeoutPromise(action) {
+            const promise = new Promise((resolve) => {
+                setTimeout(() => {
+                    action();
+                    resolve()
+                })
+            });
+            return promise;
+        }
+
+        cleanContainer();
+        
+        const umountCount = {count: 0};
+
+        class TestUnmountOnEvent extends SimpleDom.Component {
+            eventsToSubscribe() {
+                return ['TEST'];
+            }
+
+
+            componentDidUnmount() {
+                umountCount.count = umountCount.count + 1;
+            }
+
+            render() {
+                return <div>
+                    Test unmount
+                </div>
+            }
+
+        }
+
+        class TestUnmount extends SimpleDom.Component {
+            
+            componentDidUnmount() {
+                umountCount.count = umountCount.count + 1;
+            }
+
+            render() {
+                return <div>
+                    Test unmount
+                </div>
+            }
+
+        }
+        
+        class TestComponent extends SimpleDom.Component {
+            eventsToSubscribe() {
+                return ['TEST']
+            }
+            
+            render() {
+                return (
+                    <div>
+                        <TestUnmount/>
+                    </div>
+                );
+            }
+        }
+        
+        let store = new SimpleDom.Store();
+
+        SimpleDom.renderToDom(
+            'container',
+            <div>
+                <TestUnmount/>
+            </div>,
+            store
+        );
+        
+        store = new SimpleDom.Store();
+        
+        
+        expect(umountCount.count).to.be.equal(0);
+
+        SimpleDom.renderToDom(
+            'container',
+            <div>
+                <TestComponent/>
+            </div>,
+            store
+        );
+
+        timeoutPromise(() => {
+
+            expect(umountCount.count).to.be.equal(1);
+
+            store.updateState({}, 'TEST');
+        }).then(() => {
+
+            expect(umountCount.count).to.be.equal(2);
+            
+            store = new SimpleDom.Store();
+
+            SimpleDom.renderToDom(
+                'container',
+                <div>
+                    <TestUnmountOnEvent/>
+                </div>,
+                store
+            );
+        }).then(() => {
+
+            expect(umountCount.count).to.be.equal(3);
+            
+            store.updateState({}, 'TEST');
+        }).then(() => {
+            expect(umountCount.count).to.be.equal(4);
+            done();
+        })
+        
+        
+        
+        
+
     })
 
 

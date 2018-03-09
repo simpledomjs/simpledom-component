@@ -75,6 +75,13 @@ function renderComponents(node, components, store = new Store()) {
                 mutationObserver.disconnect();
                 store.unsubscribeAll();
             }
+            for (let index = store.componentsToUnmount.length -1; index >= 0; index--) {
+                const component = store.componentsToUnmount[index];
+                if (component.node && !realNode.contains(component.node)) {
+                    component.componentDidUnmount();
+                    store.componentsToUnmount.splice(index, 1);
+                }
+            }
             for (let index = store.componentsSubscribes.length - 1; index >= 0; index--) {
                 const component = store.componentsSubscribes[index];
                 if (component.component.node && !realNode.contains(component.component.node)) {
