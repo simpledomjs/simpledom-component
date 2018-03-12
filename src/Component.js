@@ -104,9 +104,13 @@ export class Component {
             return;
         }
 
-        this.componentDidUnmount && this.componentDidUnmount();  
-        this.refresh();
-        this.componentDidMount();
+        if (this.eventsToReact().includes(event)) {
+            this.react(event);
+        } else {
+            this.componentDidUnmount && this.componentDidUnmount();
+            this.refresh();
+            this.componentDidMount();
+        }
     }
 
     /**
@@ -114,9 +118,24 @@ export class Component {
      * @return {Array} array of string events to react.
      */
     eventsToSubscribe() {
+        return [...this.eventsToReact()];
+    }
+
+
+    /**
+     * Method to implement to react when an event that does not imply re rendering is sent to {@link Store}
+     * @return {Array} array of string events to react without rendering.
+     */
+    eventsToReact() {
         return [];
     }
 
+    /**
+     * Method to implement called when an event that does not imply re rendering is sent to {@link Store}
+     * @param {String} event to react on
+     */
+    react(event) {
+    }
 
     /**
      * Return false to avoid call to render on an event.

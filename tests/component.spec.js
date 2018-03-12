@@ -246,7 +246,7 @@ describe('SimpleDom component API', () => {
 
 
     it('A test for unmounting', (done) => {
-        
+
         function timeoutPromise(action) {
             const promise = new Promise((resolve) => {
                 setTimeout(() => {
@@ -258,7 +258,7 @@ describe('SimpleDom component API', () => {
         }
 
         cleanContainer();
-        
+
         const umountCount = {count: 0};
 
         class TestUnmountOnEvent extends SimpleDom.Component {
@@ -280,7 +280,7 @@ describe('SimpleDom component API', () => {
         }
 
         class TestUnmount extends SimpleDom.Component {
-            
+
             componentDidUnmount() {
                 umountCount.count = umountCount.count + 1;
             }
@@ -292,12 +292,12 @@ describe('SimpleDom component API', () => {
             }
 
         }
-        
+
         class TestComponent extends SimpleDom.Component {
             eventsToSubscribe() {
                 return ['TEST']
             }
-            
+
             render() {
                 return (
                     <div>
@@ -306,7 +306,7 @@ describe('SimpleDom component API', () => {
                 );
             }
         }
-        
+
         let store = new SimpleDom.Store();
 
         SimpleDom.renderToDom(
@@ -316,10 +316,10 @@ describe('SimpleDom component API', () => {
             </div>,
             store
         );
-        
+
         store = new SimpleDom.Store();
-        
-        
+
+
         expect(umountCount.count).to.be.equal(0);
 
         SimpleDom.renderToDom(
@@ -338,7 +338,7 @@ describe('SimpleDom component API', () => {
         }).then(() => {
 
             expect(umountCount.count).to.be.equal(2);
-            
+
             store = new SimpleDom.Store();
 
             SimpleDom.renderToDom(
@@ -351,16 +351,16 @@ describe('SimpleDom component API', () => {
         }).then(() => {
 
             expect(umountCount.count).to.be.equal(3);
-            
+
             store.updateState({}, 'TEST');
         }).then(() => {
             expect(umountCount.count).to.be.equal(4);
             done();
         })
-        
-        
-        
-        
+
+
+
+
 
     })
 
@@ -402,5 +402,52 @@ describe('SimpleDom component API', () => {
         expect(document.getElementById('container').innerHTML).to.be.equal('<div>1</div>');
 
     })
+
+});
+
+    it('Reacts to events without rendering', () => {
+
+        class Component1 extends SimpleDom.Component {
+            componentDidMount() {
+                document.getElementsByTagName('h1')[0].innerText = 'Mounted';
+            }
+
+            eventsToReact() {
+                return ['EVENT'];
+            }
+
+            react(event) {
+                console.log('i will react');
+                switch (event) {
+                    case 'EVENT':
+                        document.getElementsByTagName('h1')[0].innerText = 'React To Event';
+                    default: break;
+                }
+            }
+
+            render() {
+                return <div>{this.state.counter || 0}</div>;
+            }
+
+        }
+
+
+        cleanContainer();
+        const store = new SimpleDom.Store();
+        SimpleDom.renderToDom('container',
+            <div>
+                <h1>&nbsp;</h1>
+                <Component1/>
+            </div>, store);
+
+
+        expect(document.getElementsByTagName('h1')[0].innerText).to.be.equal('Mounted');
+        store.updateState({}, 'EVENT');
+
+        expect(document.getElementsByTagName('h1')[0].innerText).to.be.equal('React To Event');
+
+    })
+
+
 
 });
