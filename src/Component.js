@@ -52,6 +52,11 @@ export class Component {
         for (const event of this.eventsToSubscribe()) {
             this.store.subscribe(event, this.reactToChangeState.bind(this), this);
         }
+
+        for (const event of this.eventsToReact()) {
+            this.store.subscribe(event, this.react.bind(this), this);
+        }
+
         if (this.componentDidUnmount) {
             this.store.componentsToUnmount.push(this);
         }
@@ -104,13 +109,9 @@ export class Component {
             return;
         }
 
-        if (this.eventsToReact().includes(event)) {
-            this.react(event);
-        } else {
-            this.componentDidUnmount && this.componentDidUnmount();
-            this.refresh();
-            this.componentDidMount();
-        }
+        this.componentDidUnmount && this.componentDidUnmount();
+        this.refresh();
+        this.componentDidMount();
     }
 
     /**
@@ -118,7 +119,7 @@ export class Component {
      * @return {Array} array of string events to react.
      */
     eventsToSubscribe() {
-        return [...this.eventsToReact()];
+        return [];
     }
 
 

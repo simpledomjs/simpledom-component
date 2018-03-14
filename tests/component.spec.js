@@ -358,10 +358,6 @@ describe('SimpleDom component API', () => {
             done();
         })
 
-
-
-
-
     })
 
 
@@ -403,8 +399,6 @@ describe('SimpleDom component API', () => {
 
     })
 
-});
-
     it('Reacts to events without rendering', () => {
 
         class Component1 extends SimpleDom.Component {
@@ -412,12 +406,15 @@ describe('SimpleDom component API', () => {
                 document.getElementsByTagName('h1')[0].innerText = 'Mounted';
             }
 
+            eventsToSubscribe() {
+                return ['EVENT1'];
+            }
+
             eventsToReact() {
                 return ['EVENT'];
             }
 
             react(event) {
-                console.log('i will react');
                 switch (event) {
                     case 'EVENT':
                         document.getElementsByTagName('h1')[0].innerText = 'React To Event';
@@ -442,12 +439,14 @@ describe('SimpleDom component API', () => {
 
 
         expect(document.getElementsByTagName('h1')[0].innerText).to.be.equal('Mounted');
-        store.updateState({}, 'EVENT');
 
+        store.updateState({}, 'EVENT');
         expect(document.getElementsByTagName('h1')[0].innerText).to.be.equal('React To Event');
 
-    })
+        store.updateState({}, 'EVENT1');
+        expect(document.getElementsByTagName('h1')[0].innerText).to.be.equal('Mounted');
 
+    })
 
 
 });
