@@ -384,9 +384,21 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
+    "src/component.js~component#componentdidunmount",
+    "class/src/Component.js~Component.html#instance-member-componentDidUnmount",
+    "src/Component.js~Component#componentDidUnmount",
+    "member"
+  ],
+  [
     "src/component.js~component#constructor",
     "class/src/Component.js~Component.html#instance-constructor-constructor",
     "src/Component.js~Component#constructor",
+    "method"
+  ],
+  [
+    "src/component.js~component#eventstoreact",
+    "class/src/Component.js~Component.html#instance-method-eventsToReact",
+    "src/Component.js~Component#eventsToReact",
     "method"
   ],
   [
@@ -424,6 +436,12 @@ window.esdocSearchIndex = [
     "class/src/Component.js~Component.html#instance-member-props",
     "src/Component.js~Component#props",
     "member"
+  ],
+  [
+    "src/component.js~component#react",
+    "class/src/Component.js~Component.html#instance-method-react",
+    "src/Component.js~Component#react",
+    "method"
   ],
   [
     "src/component.js~component#reacttochangestate",
@@ -471,6 +489,12 @@ window.esdocSearchIndex = [
     "src/store.js~store#componentssubscribes",
     "class/src/Store.js~Store.html#instance-member-componentsSubscribes",
     "src/Store.js~Store#componentsSubscribes",
+    "member"
+  ],
+  [
+    "src/store.js~store#componentstounmount",
+    "class/src/Store.js~Store.html#instance-member-componentsToUnmount",
+    "src/Store.js~Store#componentsToUnmount",
     "member"
   ],
   [

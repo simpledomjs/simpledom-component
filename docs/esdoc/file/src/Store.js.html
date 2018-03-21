@@ -77,6 +77,12 @@ export class Store {
          * @type {Array}
          */
         this.componentsSubscribes = [];
+
+        /**
+         * Don&apos;t touch :)
+         * @type {Array}
+         */
+        this.componentsToUnmount = [];
     }
 
     /**
@@ -162,6 +168,8 @@ export class Store {
     unsubscribeAll() {
         this.subscribers = {};
         this.componentsSubscribes = [];
+        this.componentsToUnmount.forEach(component =&gt; component.componentDidUnmount());
+        this.componentsToUnmount = [];
     }
 
 

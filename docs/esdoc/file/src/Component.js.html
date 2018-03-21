@@ -98,6 +98,14 @@ export class Component {
         for (const event of this.eventsToSubscribe()) {
             this.store.subscribe(event, this.reactToChangeState.bind(this), this);
         }
+
+        for (const event of this.eventsToReact()) {
+            this.store.subscribe(event, this.react.bind(this), this);
+        }
+
+        if (this.componentDidUnmount) {
+            this.store.componentsToUnmount.push(this);
+        }
     }
 
 
@@ -147,6 +155,7 @@ export class Component {
             return;
         }
 
+        this.componentDidUnmount &amp;&amp; this.componentDidUnmount();
         this.refresh();
         this.componentDidMount();
     }
@@ -159,6 +168,21 @@ export class Component {
         return [];
     }
 
+
+    /**
+     * Method to implement to react when an event that does not imply re rendering is sent to {@link Store}
+     * @return {Array} array of string events to react without rendering.
+     */
+    eventsToReact() {
+        return [];
+    }
+
+    /**
+     * Method to implement called when an event that does not imply re rendering is sent to {@link Store}
+     * @param {String} event to react on
+     */
+    react(event) {
+    }
 
     /**
      * Return false to avoid call to render on an event.
