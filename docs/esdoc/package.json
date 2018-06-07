@@ -1,6 +1,6 @@
 {
   "name": "simpledom-component",
-  "version": "0.5.15",
+  "version": "0.5.16",
   "description": "Librairie orientée composant s'appuyant sur SimpleDom.js",
   "author": {
     "name": "Yan Bonnel",
@@ -11,7 +11,9 @@
   "scripts": {
     "clean": "del dist && del docs",
     "build": "npm run compile && npm run doc && npm run distribute",
-    "compile": "webpack -p --colors --devtool source-map",
+    "compile": "npm run compile:webpack && npm run compile:babel",
+    "compile:webpack": "webpack -p --colors --devtool source-map",
+    "compile:babel": "babel src --out-dir lib",
     "doc": "esdoc -c ./esdoc.json",
     "distribute": "mkdirp docs && ncp dist docs && ncp showroom docs && ncp esdoc docs/esdoc && echo $npm_package_version > docs/version.txt",
     "deploy": "ncp dist /documentation",
