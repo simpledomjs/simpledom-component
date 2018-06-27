@@ -94,6 +94,7 @@ export class Component {
         }
         oldNode.parentNode.replaceChild(newNode, oldNode);
 
+        this.componentDidMount();
         componentList.forEach(component => component.componentDidMount());
     }
 
