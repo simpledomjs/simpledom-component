@@ -93,7 +93,7 @@ function renderComponents(node, components, store = new Store()) {
         });
 
 
-        mutationObserver.observe(document.body, {childList: true, subtree: true});
+        mutationObserver.observe(document.body, {childList: true, subtree: true, attributes: true});
     }
 }
 
