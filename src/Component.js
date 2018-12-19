@@ -93,7 +93,7 @@ export class Component {
             return;
         }
         oldNode.parentNode.replaceChild(newNode, oldNode);
-        this.store.refreshComponentsToObserve();
+        this.store.refreshComponentsToObserve && this.store.refreshComponentsToObserve();
 
         this.componentDidMount();
         componentList.forEach(component => component.componentDidMount());

@@ -95,9 +95,9 @@ function renderComponents(node, components, store = new Store()) {
             }
         };
         
-        store.mutationObserver = new MutationObserver(() => {
-            store.refreshComponentsToObserve();
-        });
+        store.mutationObserver = new MutationObserver(() =>
+            store.refreshComponentsToObserve && store.refreshComponentsToObserve()
+        );
         
         store.mutationObserver.observe(document.body, {childList: true, subtree: true});
     }
