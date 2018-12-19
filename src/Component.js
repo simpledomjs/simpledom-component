@@ -87,7 +87,7 @@ export class Component {
         const oldNode = this.node;
         this.node = null;
         let newNode = convertToNode(this.renderComponent(), this.store, componentList);
-        if (newNode === undefined && newNode === null) {
+        if (newNode === undefined || newNode === null) {
             oldNode.parentNode.removeChild(oldNode);
             this.componentDidMount();
             return;
