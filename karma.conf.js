@@ -2,6 +2,8 @@
 // Generated on Mon Sep 21 2015 11:15:10 GMT+0200 (CEST)
 
 module.exports = function(config) {
+  const autoWatch = process.env.AUTO_WATCH === "false" ? false : true;
+    
   config.set({
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
@@ -53,7 +55,7 @@ module.exports = function(config) {
 
 
     // enable / disable watching file and executing tests whenever any file changes
-    autoWatch: true,
+    autoWatch: autoWatch,
 
 
     // start these browsers
@@ -85,6 +87,6 @@ module.exports = function(config) {
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
-    singleRun: false
+    singleRun: !autoWatch
   })
 }

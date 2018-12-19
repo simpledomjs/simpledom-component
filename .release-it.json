@@ -1,0 +1,15 @@
+{
+    "non-interactive": false,
+    "verbose": true,
+    "scripts": {
+        "beforeStart": "AUTO_WATCH=false npm run test",
+        "afterBump": "npm run clean && npm run build",
+        "afterRelease": "echo Successfully released ${name} v${version} to ${repo.repository}."
+    },
+    "npm": {
+        "publish": true
+    },
+    "dist": {
+      "baseDir": "."
+    }
+}
