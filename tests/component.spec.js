@@ -372,6 +372,10 @@ describe('SimpleDom component API', () => {
         }
 
         class Component2 extends SimpleDom.Component {
+            eventsToSubscribe() {
+                return ['EVENT2'];
+            }
+            
             render() {
                 return <Component1/>;
             }
@@ -397,7 +401,19 @@ describe('SimpleDom component API', () => {
 
         expect(document.getElementById('container').innerHTML).to.be.equal('<div>1</div>');
 
-    })
+        store.updateState({counter: 2}, 'EVENT');
+
+        expect(document.getElementById('container').innerHTML).to.be.equal('<div>2</div>');
+
+        store.updateState({counter: 1}, 'EVENT2');
+
+        expect(document.getElementById('container').innerHTML).to.be.equal('<div>1</div>');
+
+        store.updateState({counter: 2}, 'EVENT2');
+
+        expect(document.getElementById('container').innerHTML).to.be.equal('<div>2</div>');
+
+    });
 
     it('Reacts to events without rendering', () => {
 

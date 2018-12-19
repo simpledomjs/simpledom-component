@@ -70,9 +70,12 @@ function renderComponents(node, components, store = new Store()) {
     componentList.forEach(component => component.componentDidMount());
 
     if (componentList.length) {
-        const mutationObserver = new MutationObserver(() => {
+
+        
+
+        store.refreshComponentsToObserve = function() {
             if (!document.body.contains(realNode)) {
-                mutationObserver.disconnect();
+                store.mutationObserver && store.mutationObserver .disconnect();
                 store.unsubscribeAll();
             }
             for (let index = store.componentsToUnmount.length -1; index >= 0; index--) {
@@ -90,10 +93,13 @@ function renderComponents(node, components, store = new Store()) {
                     store.componentsSubscribes.splice(index, 1);
                 }
             }
+        };
+        
+        store.mutationObserver = new MutationObserver(() => {
+            store.refreshComponentsToObserve();
         });
-
-
-        mutationObserver.observe(document.body, {childList: true, subtree: true});
+        
+        store.mutationObserver.observe(document.body, {childList: true, subtree: true});
     }
 }
 
