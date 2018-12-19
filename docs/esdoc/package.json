@@ -1,6 +1,6 @@
 {
   "name": "simpledom-component",
-  "version": "0.5.18",
+  "version": "0.5.19",
   "description": "Librairie orientée composant s'appuyant sur SimpleDom.js",
   "author": {
     "name": "Yan Bonnel",
@@ -18,7 +18,9 @@
     "distribute": "mkdirp docs && ncp dist docs && ncp showroom docs && ncp esdoc docs/esdoc && echo $npm_package_version > docs/version.txt",
     "deploy": "ncp dist /documentation",
     "start": "webpack-dev-server -d --colors --hot --inline --progress --content-base showroom/",
-    "test": "karma start"
+    "test": "karma start",
+    "test-no-watch": "karma start --auto-watch false",
+    "release": "release-it"
   },
   "devDependencies": {
     "babel": "6.5.2",
@@ -50,6 +52,7 @@
     "style-loader": "0.13.1",
     "url-loader": "0.5.7",
     "webpack": "1.14.0",
-    "webpack-dev-server": "1.16.2"
+    "webpack-dev-server": "1.16.2",
+    "release-it": "9.1.0"
   }
 }

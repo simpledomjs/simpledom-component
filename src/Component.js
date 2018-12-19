@@ -87,12 +87,13 @@ export class Component {
         const oldNode = this.node;
         this.node = null;
         let newNode = convertToNode(this.renderComponent(), this.store, componentList);
-        if (newNode === undefined && newNode === null) {
+        if (newNode === undefined || newNode === null) {
             oldNode.parentNode.removeChild(oldNode);
             this.componentDidMount();
             return;
         }
         oldNode.parentNode.replaceChild(newNode, oldNode);
+        this.store.refreshComponentsToObserve && this.store.refreshComponentsToObserve();
 
         this.componentDidMount();
         componentList.forEach(component => component.componentDidMount());
