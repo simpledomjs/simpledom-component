@@ -1,44 +1,44 @@
 window.esdocSearchIndex = [
   [
-    "simpledom-component~component",
+    "simpledom-component/dist/simpledom-component.js~component",
     "class/src/Component.js~Component.html",
-    "<span>Component</span> <span class=\"search-result-import-path\">simpledom-component</span>",
+    "<span>Component</span> <span class=\"search-result-import-path\">simpledom-component/dist/simpledom-component.js</span>",
     "class"
   ],
   [
-    "simpledom-component~store",
+    "simpledom-component/dist/simpledom-component.js~store",
     "class/src/Store.js~Store.html",
-    "<span>Store</span> <span class=\"search-result-import-path\">simpledom-component</span>",
+    "<span>Store</span> <span class=\"search-result-import-path\">simpledom-component/dist/simpledom-component.js</span>",
     "class"
   ],
   [
-    "simpledom-component~el",
+    "simpledom-component/dist/simpledom-component.js~el",
     "function/index.html#static-function-el",
-    "<span>el</span> <span class=\"search-result-import-path\">simpledom-component</span>",
+    "<span>el</span> <span class=\"search-result-import-path\">simpledom-component/dist/simpledom-component.js</span>",
     "function"
   ],
   [
-    "simpledom-component~predicate",
+    "simpledom-component/dist/simpledom-component.js~predicate",
     "function/index.html#static-function-predicate",
-    "<span>predicate</span> <span class=\"search-result-import-path\">simpledom-component</span>",
+    "<span>predicate</span> <span class=\"search-result-import-path\">simpledom-component/dist/simpledom-component.js</span>",
     "function"
   ],
   [
-    "simpledom-component~renderto",
+    "simpledom-component/dist/simpledom-component.js~renderto",
     "function/index.html#static-function-renderTo",
-    "<span>renderTo</span> <span class=\"search-result-import-path\">simpledom-component</span>",
+    "<span>renderTo</span> <span class=\"search-result-import-path\">simpledom-component/dist/simpledom-component.js</span>",
     "function"
   ],
   [
-    "simpledom-component~rendertodom",
+    "simpledom-component/dist/simpledom-component.js~rendertodom",
     "function/index.html#static-function-renderToDom",
-    "<span>renderToDom</span> <span class=\"search-result-import-path\">simpledom-component</span>",
+    "<span>renderToDom</span> <span class=\"search-result-import-path\">simpledom-component/dist/simpledom-component.js</span>",
     "function"
   ],
   [
-    "simpledom-component~rendertostring",
+    "simpledom-component/dist/simpledom-component.js~rendertostring",
     "function/index.html#static-function-renderToString",
-    "<span>renderToString</span> <span class=\"search-result-import-path\">simpledom-component</span>",
+    "<span>renderToString</span> <span class=\"search-result-import-path\">simpledom-component/dist/simpledom-component.js</span>",
     "function"
   ],
   [
