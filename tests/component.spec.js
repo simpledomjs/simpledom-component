@@ -415,6 +415,53 @@ describe('SimpleDom component API', () => {
 
     });
 
+
+
+    it('Test with multiple component inside component and refresh after update state on parent', () => {
+
+        class ComponentButton extends SimpleDom.Component {
+            eventsToSubscribe() {
+                return ['EVENT2'];
+            }
+
+            render() {
+                return <button onClick={() => {
+                    this.store.updateState({counter: this.state.counter+1}, 'EVENT');
+                    this.refresh();
+                }}>{this.state.counter}</button>;
+            }
+        }
+
+        class ComponentParent extends SimpleDom.Component {
+            eventsToSubscribe() {
+                return ['EVENT'];
+            }
+
+            render() {
+                return <ComponentButton/>;
+            }
+        }
+
+        cleanContainer();
+        const store = new SimpleDom.Store({counter: 0});
+        SimpleDom.renderToDom('container', <ComponentParent/>, store);
+
+        expect(document.getElementById('container').innerHTML).to.be.equal('<button>0</button>');
+
+        document.getElementById('container').querySelector("button").click();
+
+        expect(document.getElementById('container').innerHTML).to.be.equal('<button>1</button>');
+
+        document.getElementById('container').querySelector("button").click();
+
+        expect(document.getElementById('container').innerHTML).to.be.equal('<button>2</button>');
+
+        document.getElementById('container').querySelector("button").click();
+
+        expect(document.getElementById('container').innerHTML).to.be.equal('<button>3</button>');
+
+    });
+
     it('Reacts to events without rendering', () => {
 
         class Component1 extends SimpleDom.Component {
