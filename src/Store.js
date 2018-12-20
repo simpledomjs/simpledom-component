@@ -47,6 +47,8 @@ export class Store {
     updateState(newState, ...events) {
         const oldState = this.state;
         this.state = {...this.state, ...newState};
+        
+        const sourceEvent = events.length === 1 ? events[0] : events;
 
         const eventsToPropagate = events.concat('*');
 
@@ -56,7 +58,7 @@ export class Store {
             if (this.subscribers[event]) {
                 for (const id in this.subscribers[event]) {
                     if (this.subscribers[event].hasOwnProperty(id)) {
-                        this.subscribers[event][id](event, this.state, oldState);
+                        this.subscribers[event][id](event === '*' ? sourceEvent : event, this.state, oldState);
                     }
                 }
             }

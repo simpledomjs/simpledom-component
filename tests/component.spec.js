@@ -21,19 +21,32 @@ describe('Store API', () => {
 
         let eventCounter = 0;
         let allCounter = 0;
+        let lastEvent = '';
 
         store.subscribe('event', () => eventCounter++);
-        store.subscribe('*', () => allCounter++);
+        store.subscribe('*', (event) => {
+            lastEvent = event;
+            allCounter++;
+        });
 
         store.updateState({}, 'otherEvent');
 
         expect(allCounter).to.be.equal(1);
         expect(eventCounter).to.be.equal(0);
+        expect(lastEvent).to.be.equal('otherEvent');
 
         store.updateState({}, 'event');
 
         expect(allCounter).to.be.equal(2);
         expect(eventCounter).to.be.equal(1);
+        expect(lastEvent).to.be.equal('event');
+
+
+        store.updateState({}, 'event', 'otherEvent');
+        
+        expect(allCounter).to.be.equal(3);
+        expect(eventCounter).to.be.equal(2);
+        expect('' + lastEvent).to.be.equal('event,otherEvent');
 
     });
 });
