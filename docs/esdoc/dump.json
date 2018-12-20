@@ -10,7 +10,7 @@
     "access": null,
     "description": null,
     "lineNumber": 1,
-    "content": "\nimport { el } from './renderer';\nimport { convertToNode } from './converter';\n\n/**\n * Class for a component.\n * ```\n *   class HelloWorldComponent extends Component {\n *      render() {\n *          return (\n *              <h1>{this.props.message}</h1>\n *          );\n *      }\n *   }\n *\n *   renderToDom('container', <HelloWorldComponent messsage=\"Hello World!\"/>);\n * ```\n */\nexport class Component {\n    static isComponent = true;\n\n    /**\n     * The state of the current store\n     * @type {Object}\n     */\n    get state() {\n        return this.store.state;\n    }\n\n    /**\n     * Constructor of a component.\n     * @param {Object} props the props (attributes pass to dom node + children)\n     * @param {Store} store the store.\n     */\n    constructor(props, store = undefined) {\n        /**\n         * The props  (attributes pass to dom node + children).\n         * @type {Object}\n         */\n        this.props = props;\n        /**\n         * The store share between all components.\n         * @type {Store}\n         */\n        this.store = store;\n\n        Object.getOwnPropertyNames(Object.getPrototypeOf(this))\n            .filter(name => name !== 'constructor')\n            .filter(name => this[name] instanceof Function)\n            .forEach(name => this[name] = this[name].bind(this));\n\n        for (const event of this.eventsToSubscribe()) {\n            this.store.subscribe(event, this.reactToChangeState.bind(this), this);\n        }\n\n        for (const event of this.eventsToReact()) {\n            this.store.subscribe(event, this.react.bind(this), this);\n        }\n\n        if (this.componentDidUnmount) {\n            this.store.componentsToUnmount.push(this);\n        }\n    }\n\n\n    /**\n     * Do not touch :)\n     * @param {Node} node parent node of the component.\n     */\n    nodeRefHandler(node) {\n        /**\n         * Parent node of the component.\n         * @type {Node}\n         */\n        this.node = node;\n        if (this.otherRef) {\n            this.otherRef(node);\n        }\n    }\n\n    /**\n     * Method to call to refresh the component without the use of the store.\n     * Useful for internal state with this.\n     */\n    refresh() {\n        const componentList = [];\n        const oldNode = this.node;\n        this.node = null;\n        let newNode = convertToNode(this.renderComponent(), this.store, componentList);\n        if (newNode === undefined || newNode === null) {\n            oldNode.parentNode && oldNode.parentNode.removeChild(oldNode);\n            this.componentDidMount();\n            return;\n        }\n        oldNode.parentNode && oldNode.parentNode.replaceChild(newNode, oldNode);\n        this.store.refreshComponentsToObserve && this.store.refreshComponentsToObserve();\n\n        this.componentDidMount();\n        componentList.forEach(component => component.componentDidMount());\n    }\n\n    /**\n     * Internally method which is called when an event of {@link eventsToSubscribe}\n     * You can override the method if you want a specific\n     * @param {string} event event received in the store.\n     * @param {Object} newState the new state.\n     * @param {Object} oldState the old state.\n     */\n    reactToChangeState(event, newState, oldState) {\n        if (!this.mustRefresh(oldState, newState) || !this.node) {\n            return;\n        }\n\n        this.componentDidUnmount && this.componentDidUnmount();\n        this.refresh();\n        this.componentDidMount();\n    }\n\n    /**\n     * Method to implement to react when an event is send to {@link Store}\n     * @return {Array} array of string events to react.\n     */\n    eventsToSubscribe() {\n        return [];\n    }\n\n\n    /**\n     * Method to implement to react when an event that does not imply re rendering is sent to {@link Store}\n     * @return {Array} array of string events to react without rendering.\n     */\n    eventsToReact() {\n        return [];\n    }\n\n    /**\n     * Method to implement called when an event that does not imply re rendering is sent to {@link Store}\n     * @param {String} event to react on\n     */\n    react(event) {\n    }\n\n    /**\n     * Return false to avoid call to render on an event.\n     * @param {Object} oldState the old state.\n     * @param {Object} newState the new state.\n     */\n    mustRefresh(oldState, newState) {\n        return true;\n    }\n\n    /**\n     * Method called after rendered into DOM.\n     * @abstract\n     */\n    componentDidMount() {\n    }\n\n    /**\n     * Method use internally to render a component.\n     * @return {Component|Object} This return a component or result of SimpleDom.el.\n     */\n    renderComponent(otherRef) {\n        const result = this.render();\n        this.otherRef = otherRef;\n        if (result === undefined || result === null) {\n            return el('div',\n                {\n                    ref: node => this.nodeRefHandler(node),\n                    style: {\n                        width: 0,\n                        height: 0\n                    }\n                }\n            );\n        }\n\n        if (result.isElem) {\n            let oldRef = result.attrs.ref;\n            result.attrs.ref = node => {\n                oldRef && oldRef(node);\n                this.nodeRefHandler(node);\n            };\n        } else if (result.isComponent) {\n            result.otherRef = node => this.nodeRefHandler(node);\n        } else {\n            console.error('Unkown result type for a component', result);\n        }\n\n        return result;\n    }\n\n    /**\n     * Method to implement to render something.\n     * @abstract\n     * @return {Component|Object} This return a component or result of {@link el}.\n     */\n    render() {\n        return undefined;\n    }\n\n}\n"
+    "content": "\nimport { el } from './renderer';\nimport { convertToNode } from './converter';\n\n/**\n * Class for a component.\n * ```\n *   class HelloWorldComponent extends Component {\n *      render() {\n *          return (\n *              <h1>{this.props.message}</h1>\n *          );\n *      }\n *   }\n *\n *   renderToDom('container', <HelloWorldComponent messsage=\"Hello World!\"/>);\n * ```\n */\nexport class Component {\n    static isComponent = true;\n\n    /**\n     * The state of the current store\n     * @type {Object}\n     */\n    get state() {\n        return this.store.state;\n    }\n\n    /**\n     * Constructor of a component.\n     * @param {Object} props the props (attributes pass to dom node + children)\n     * @param {Store} store the store.\n     */\n    constructor(props, store = undefined) {\n        /**\n         * The props  (attributes pass to dom node + children).\n         * @type {Object}\n         */\n        this.props = props;\n        /**\n         * The store share between all components.\n         * @type {Store}\n         */\n        this.store = store;\n\n        Object.getOwnPropertyNames(Object.getPrototypeOf(this))\n            .filter(name => name !== 'constructor')\n            .filter(name => this[name] instanceof Function)\n            .forEach(name => this[name] = this[name].bind(this));\n\n        for (const event of this.eventsToSubscribe()) {\n            this.store.subscribe(event, this.reactToChangeState.bind(this), this);\n        }\n\n        for (const event of this.eventsToReact()) {\n            this.store.subscribe(event, this.react.bind(this), this);\n        }\n\n        if (this.componentDidUnmount) {\n            this.store.componentsToUnmount.push(this);\n        }\n    }\n\n\n    /**\n     * Do not touch :)\n     * @param {Node} node parent node of the component.\n     */\n    nodeRefHandler(node) {\n        /**\n         * Parent node of the component.\n         * @type {Node}\n         */\n        this.node = node;\n        if (this.otherRef) {\n            this.otherRef(node);\n        }\n    }\n\n    /**\n     * Method to call to refresh the component without the use of the store.\n     * Useful for internal state with this.\n     */\n    refresh() {\n        const componentList = [];\n        const oldNode = this.node;\n        if (!oldNode) {\n            console.warn(\"It's you've done double refresh on same component, please don't do this\", new Error());\n        }\n        this.node = null;\n        let newNode = convertToNode(this.renderComponent(), this.store, componentList);\n        if (newNode === undefined || newNode === null) {\n            oldNode && oldNode.parentNode && oldNode.parentNode.removeChild(oldNode);\n            this.componentDidMount();\n            return;\n        }\n        oldNode && oldNode.parentNode && oldNode.parentNode.replaceChild(newNode, oldNode);\n        this.store.refreshComponentsToObserve && this.store.refreshComponentsToObserve();\n\n        this.componentDidMount();\n        componentList.forEach(component => component.componentDidMount());\n    }\n\n    /**\n     * Internally method which is called when an event of {@link eventsToSubscribe}\n     * You can override the method if you want a specific\n     * @param {string} event event received in the store.\n     * @param {Object} newState the new state.\n     * @param {Object} oldState the old state.\n     */\n    reactToChangeState(event, newState, oldState) {\n        if (!this.mustRefresh(oldState, newState) || !this.node) {\n            return;\n        }\n\n        this.componentDidUnmount && this.componentDidUnmount();\n        this.refresh();\n        this.componentDidMount();\n    }\n\n    /**\n     * Method to implement to react when an event is send to {@link Store}\n     * @return {Array} array of string events to react.\n     */\n    eventsToSubscribe() {\n        return [];\n    }\n\n\n    /**\n     * Method to implement to react when an event that does not imply re rendering is sent to {@link Store}\n     * @return {Array} array of string events to react without rendering.\n     */\n    eventsToReact() {\n        return [];\n    }\n\n    /**\n     * Method to implement called when an event that does not imply re rendering is sent to {@link Store}\n     * @param {String} event to react on\n     */\n    react(event) {\n    }\n\n    /**\n     * Return false to avoid call to render on an event.\n     * @param {Object} oldState the old state.\n     * @param {Object} newState the new state.\n     */\n    mustRefresh(oldState, newState) {\n        return true;\n    }\n\n    /**\n     * Method called after rendered into DOM.\n     * @abstract\n     */\n    componentDidMount() {\n    }\n\n    /**\n     * Method use internally to render a component.\n     * @return {Component|Object} This return a component or result of SimpleDom.el.\n     */\n    renderComponent(otherRef) {\n        const result = this.render();\n        this.otherRef = otherRef;\n        if (result === undefined || result === null) {\n            return el('div',\n                {\n                    ref: node => this.nodeRefHandler(node),\n                    style: {\n                        width: 0,\n                        height: 0\n                    }\n                }\n            );\n        }\n\n        if (result.isElem) {\n            let oldRef = result.attrs.ref;\n            result.attrs.ref = node => {\n                oldRef && oldRef(node);\n                this.nodeRefHandler(node);\n            };\n        } else if (result.isComponent) {\n            result.otherRef = node => this.nodeRefHandler(node);\n        } else {\n            console.error('Unkown result type for a component', result);\n        }\n\n        return result;\n    }\n\n    /**\n     * Method to implement to render something.\n     * @abstract\n     * @return {Component|Object} This return a component or result of {@link el}.\n     */\n    render() {\n        return undefined;\n    }\n\n}\n"
   },
   {
     "__docId__": 1,
@@ -193,7 +193,7 @@
     "longname": "src/Component.js~Component#node",
     "access": null,
     "description": null,
-    "lineNumber": 88,
+    "lineNumber": 91,
     "undocument": true,
     "type": {
       "types": [
@@ -211,7 +211,7 @@
     "longname": "src/Component.js~Component#reactToChangeState",
     "access": null,
     "description": "Internally method which is called when an event of {@link eventsToSubscribe}\nYou can override the method if you want a specific",
-    "lineNumber": 109,
+    "lineNumber": 112,
     "params": [
       {
         "nullable": null,
@@ -256,7 +256,7 @@
     "longname": "src/Component.js~Component#componentDidUnmount",
     "access": null,
     "description": null,
-    "lineNumber": 114,
+    "lineNumber": 117,
     "undocument": true,
     "type": {
       "types": [
@@ -274,7 +274,7 @@
     "longname": "src/Component.js~Component#eventsToSubscribe",
     "access": null,
     "description": "Method to implement to react when an event is send to {@link Store}",
-    "lineNumber": 123,
+    "lineNumber": 126,
     "params": [],
     "return": {
       "nullable": null,
@@ -296,7 +296,7 @@
     "longname": "src/Component.js~Component#eventsToReact",
     "access": null,
     "description": "Method to implement to react when an event that does not imply re rendering is sent to {@link Store}",
-    "lineNumber": 132,
+    "lineNumber": 135,
     "params": [],
     "return": {
       "nullable": null,
@@ -318,7 +318,7 @@
     "longname": "src/Component.js~Component#react",
     "access": null,
     "description": "Method to implement called when an event that does not imply re rendering is sent to {@link Store}",
-    "lineNumber": 140,
+    "lineNumber": 143,
     "params": [
       {
         "nullable": null,
@@ -343,7 +343,7 @@
     "longname": "src/Component.js~Component#mustRefresh",
     "access": null,
     "description": "Return false to avoid call to render on an event.",
-    "lineNumber": 148,
+    "lineNumber": 151,
     "params": [
       {
         "nullable": null,
@@ -383,7 +383,7 @@
     "longname": "src/Component.js~Component#componentDidMount",
     "access": null,
     "description": "Method called after rendered into DOM.",
-    "lineNumber": 156,
+    "lineNumber": 159,
     "params": [],
     "abstract": true,
     "generator": false
@@ -398,7 +398,7 @@
     "longname": "src/Component.js~Component#renderComponent",
     "access": null,
     "description": "Method use internally to render a component.",
-    "lineNumber": 163,
+    "lineNumber": 166,
     "params": [
       {
         "name": "otherRef",
@@ -428,7 +428,7 @@
     "longname": "src/Component.js~Component#otherRef",
     "access": null,
     "description": null,
-    "lineNumber": 165,
+    "lineNumber": 168,
     "undocument": true,
     "type": {
       "types": [
@@ -446,7 +446,7 @@
     "longname": "src/Component.js~Component#render",
     "access": null,
     "description": "Method to implement to render something.",
-    "lineNumber": 198,
+    "lineNumber": 201,
     "params": [],
     "return": {
       "nullable": null,
@@ -471,7 +471,7 @@
     "access": null,
     "description": null,
     "lineNumber": 1,
-    "content": "\n\nlet generatedId = 1;\n\nfunction generateId() {\n    return generatedId++;\n}\n\n/**\n * A simple Store which receive all state changes with an event (string).\n */\nexport class Store {\n    /**\n     * The constructor.\n     * @param {object} initialeState the initial state.\n     */\n    constructor(initialeState = {}) {\n        /**\n         * The state of store.\n         * @type {object}\n         */\n        this.state = initialeState;\n        /**\n         * Don't touch :)\n         * @type {Object}\n         */\n        this.subscribers = {};\n\n        /**\n         * Don't touch :)\n         * @type {Array}\n         */\n        this.componentsSubscribes = [];\n\n        /**\n         * Don't touch :)\n         * @type {Array}\n         */\n        this.componentsToUnmount = [];\n    }\n\n    /**\n     * Method to call to change the state.\n     * @param {object} newState the new state (you can put only attributes changed).\n     * @param {...string} events events to the origin of the state change.\n     */\n    updateState(newState, ...events) {\n        const oldState = this.state;\n        this.state = {...this.state, ...newState};\n\n        const eventsToPropagate = events.concat('*');\n\n        let index = eventsToPropagate.length;\n        while (index--) {\n            const event = eventsToPropagate[index];\n            if (this.subscribers[event]) {\n                for (const id in this.subscribers[event]) {\n                    if (this.subscribers[event].hasOwnProperty(id)) {\n                        this.subscribers[event][id](event, this.state, oldState);\n                    }\n                }\n            }\n        }\n    }\n\n    /**\n     * Method to call to subscribe to an event.\n     *\n     * There is a special event that catches all events : '*'.\n     *\n     * @param {string} event event to subscribe.\n     * @param {function(event: string, state: object, oldState:object)} callback the callback called when receive the event.\n     * @param {Component} component use internally to unsubcribe component when node disappear\n     * @return {number} the id to put in param of {@link unsubscribe} to unsubscribe.\n     */\n    subscribe(event, callback = state => {}, component) {\n        if (!this.subscribers[event]) {\n            this.subscribers[event] = {};\n        }\n        const id = generateId();\n        this.subscribers[event][id] = callback;\n\n        if (component) {\n            let componentWrapper = undefined;\n            for (const componentAlreadySubcribes of this.componentsSubscribes) {\n                if (componentAlreadySubcribes.component === component) {\n                    componentWrapper = componentAlreadySubcribes;\n                    break;\n                }\n            }\n            if (!componentWrapper) {\n                componentWrapper = {\n                    component,\n                    subscribes: []\n                };\n                this.componentsSubscribes.push(componentWrapper);\n            }\n            componentWrapper.subscribes.push({\n                event,\n                id\n            });\n        }\n\n        return id;\n    }\n\n    /**\n     * Unsubscribe.\n     * @param {number} id id received at {@link subscribe}\n     */\n    unsubsribe(id) {\n        for (let event of Object.keys(this.subscribers)) {\n            if (this.subscribers[event][id]) {\n                delete this.subscribers[event][id];\n            }\n        }\n    }\n\n    /**\n     * Unsubcribe all subcribers.\n     */\n    unsubscribeAll() {\n        this.subscribers = {};\n        this.componentsSubscribes = [];\n        this.componentsToUnmount.forEach(component => component.componentDidUnmount());\n        this.componentsToUnmount = [];\n    }\n\n\n\n    /**\n     * Unsubscribe.\n     * @param {string} event event sent to {@link subscribe}\n     * @param {number} id id received at {@link subscribe}\n     */\n    unsubscribeByEventAndId(event, id) {\n        if (this.subscribers[event][id]) {\n            delete this.subscribers[event][id];\n        }\n    }\n}\n"
+    "content": "\n\nlet generatedId = 1;\n\nfunction generateId() {\n    return generatedId++;\n}\n\n/**\n * A simple Store which receive all state changes with an event (string).\n */\nexport class Store {\n    /**\n     * The constructor.\n     * @param {object} initialeState the initial state.\n     */\n    constructor(initialeState = {}) {\n        /**\n         * The state of store.\n         * @type {object}\n         */\n        this.state = initialeState;\n        /**\n         * Don't touch :)\n         * @type {Object}\n         */\n        this.subscribers = {};\n\n        /**\n         * Don't touch :)\n         * @type {Array}\n         */\n        this.componentsSubscribes = [];\n\n        /**\n         * Don't touch :)\n         * @type {Array}\n         */\n        this.componentsToUnmount = [];\n    }\n\n    /**\n     * Method to call to change the state.\n     * @param {object} newState the new state (you can put only attributes changed).\n     * @param {...string} events events to the origin of the state change.\n     */\n    updateState(newState, ...events) {\n        const oldState = this.state;\n        this.state = {...this.state, ...newState};\n        \n        const sourceEvent = events.length === 1 ? events[0] : events;\n\n        const eventsToPropagate = events.concat('*');\n\n        let index = eventsToPropagate.length;\n        while (index--) {\n            const event = eventsToPropagate[index];\n            if (this.subscribers[event]) {\n                for (const id in this.subscribers[event]) {\n                    if (this.subscribers[event].hasOwnProperty(id)) {\n                        this.subscribers[event][id](event === '*' ? sourceEvent : event, this.state, oldState);\n                    }\n                }\n            }\n        }\n    }\n\n    /**\n     * Method to call to subscribe to an event.\n     *\n     * There is a special event that catches all events : '*'.\n     *\n     * @param {string} event event to subscribe.\n     * @param {function(event: string, state: object, oldState:object)} callback the callback called when receive the event.\n     * @param {Component} component use internally to unsubcribe component when node disappear\n     * @return {number} the id to put in param of {@link unsubscribe} to unsubscribe.\n     */\n    subscribe(event, callback = state => {}, component) {\n        if (!this.subscribers[event]) {\n            this.subscribers[event] = {};\n        }\n        const id = generateId();\n        this.subscribers[event][id] = callback;\n\n        if (component) {\n            let componentWrapper = undefined;\n            for (const componentAlreadySubcribes of this.componentsSubscribes) {\n                if (componentAlreadySubcribes.component === component) {\n                    componentWrapper = componentAlreadySubcribes;\n                    break;\n                }\n            }\n            if (!componentWrapper) {\n                componentWrapper = {\n                    component,\n                    subscribes: []\n                };\n                this.componentsSubscribes.push(componentWrapper);\n            }\n            componentWrapper.subscribes.push({\n                event,\n                id\n            });\n        }\n\n        return id;\n    }\n\n    /**\n     * Unsubscribe.\n     * @param {number} id id received at {@link subscribe}\n     */\n    unsubsribe(id) {\n        for (let event of Object.keys(this.subscribers)) {\n            if (this.subscribers[event][id]) {\n                delete this.subscribers[event][id];\n            }\n        }\n    }\n\n    /**\n     * Unsubcribe all subcribers.\n     */\n    unsubscribeAll() {\n        this.subscribers = {};\n        this.componentsSubscribes = [];\n        this.componentsToUnmount.forEach(component => component.componentDidUnmount());\n        this.componentsToUnmount = [];\n    }\n\n\n\n    /**\n     * Unsubscribe.\n     * @param {string} event event sent to {@link subscribe}\n     * @param {number} id id received at {@link subscribe}\n     */\n    unsubscribeByEventAndId(event, id) {\n        if (this.subscribers[event][id]) {\n            delete this.subscribers[event][id];\n        }\n    }\n}\n"
   },
   {
     "__docId__": 21,
@@ -701,7 +701,7 @@
     "longname": "src/Store.js~Store#subscribe",
     "access": null,
     "description": "Method to call to subscribe to an event.\n\nThere is a special event that catches all events : '*'.",
-    "lineNumber": 76,
+    "lineNumber": 78,
     "params": [
       {
         "nullable": null,
@@ -754,7 +754,7 @@
     "longname": "src/Store.js~Store#unsubsribe",
     "access": null,
     "description": "Unsubscribe.",
-    "lineNumber": 111,
+    "lineNumber": 113,
     "params": [
       {
         "nullable": null,
@@ -779,7 +779,7 @@
     "longname": "src/Store.js~Store#unsubscribeAll",
     "access": null,
     "description": "Unsubcribe all subcribers.",
-    "lineNumber": 122,
+    "lineNumber": 124,
     "params": [],
     "generator": false
   },
@@ -793,7 +793,7 @@
     "longname": "src/Store.js~Store#subscribers",
     "access": null,
     "description": null,
-    "lineNumber": 123,
+    "lineNumber": 125,
     "undocument": true,
     "type": {
       "types": [
@@ -811,7 +811,7 @@
     "longname": "src/Store.js~Store#componentsSubscribes",
     "access": null,
     "description": null,
-    "lineNumber": 124,
+    "lineNumber": 126,
     "undocument": true,
     "type": {
       "types": [
@@ -829,7 +829,7 @@
     "longname": "src/Store.js~Store#componentsToUnmount",
     "access": null,
     "description": null,
-    "lineNumber": 126,
+    "lineNumber": 128,
     "undocument": true,
     "type": {
       "types": [
@@ -847,7 +847,7 @@
     "longname": "src/Store.js~Store#unsubscribeByEventAndId",
     "access": null,
     "description": "Unsubscribe.",
-    "lineNumber": 136,
+    "lineNumber": 138,
     "params": [
       {
         "nullable": null,
