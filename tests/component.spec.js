@@ -420,6 +420,8 @@ describe('SimpleDom component API', () => {
 
         store.updateState({counter: 1}, 'EVENT2');
 
+        expect(store.componentsSubscribes.length).to.be.equal(2);
+
         expect(document.getElementById('container').innerHTML).to.be.equal('<div>1</div>');
 
         store.updateState({counter: 2}, 'EVENT2');
