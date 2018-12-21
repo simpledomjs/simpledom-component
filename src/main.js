@@ -1,6 +1,6 @@
-import { Component } from './Component';
-import { Store } from './Store';
-import { el, renderToDom, renderTo, renderToString } from './renderer';
+export { Component } from './Component';
+export { Store } from './Store';
+export { el, renderToDom, renderTo, renderToString } from './renderer';
 import { isFunction } from  './util';
 
 /**
@@ -27,10 +27,3 @@ export function predicate(cond, element, elseElement) {
     }
     return isFunction(elseElement) ? elseElement() : elseElement;
 }
-
-exports.Component = Component;
-exports.Store = Store;
-exports.el = el;
-exports.renderToDom = renderToDom;
-exports.renderTo = renderTo;
-exports.renderToString = renderToString;
