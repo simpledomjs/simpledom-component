@@ -1,8 +1,44 @@
 window.esdocSearchIndex = [
   [
-    "simpledom-component/dist/simpledom-component.js~predicate",
+    "simpledom-component~component",
+    "class/src/Component.js~Component.html",
+    "<span>Component</span> <span class=\"search-result-import-path\">simpledom-component</span>",
+    "class"
+  ],
+  [
+    "simpledom-component~store",
+    "class/src/Store.js~Store.html",
+    "<span>Store</span> <span class=\"search-result-import-path\">simpledom-component</span>",
+    "class"
+  ],
+  [
+    "simpledom-component~el",
+    "function/index.html#static-function-el",
+    "<span>el</span> <span class=\"search-result-import-path\">simpledom-component</span>",
+    "function"
+  ],
+  [
+    "simpledom-component~predicate",
     "function/index.html#static-function-predicate",
-    "<span>predicate</span> <span class=\"search-result-import-path\">simpledom-component/dist/simpledom-component.js</span>",
+    "<span>predicate</span> <span class=\"search-result-import-path\">simpledom-component</span>",
+    "function"
+  ],
+  [
+    "simpledom-component~renderto",
+    "function/index.html#static-function-renderTo",
+    "<span>renderTo</span> <span class=\"search-result-import-path\">simpledom-component</span>",
+    "function"
+  ],
+  [
+    "simpledom-component~rendertodom",
+    "function/index.html#static-function-renderToDom",
+    "<span>renderToDom</span> <span class=\"search-result-import-path\">simpledom-component</span>",
+    "function"
+  ],
+  [
+    "simpledom-component~rendertostring",
+    "function/index.html#static-function-renderToString",
+    "<span>renderToString</span> <span class=\"search-result-import-path\">simpledom-component</span>",
     "function"
   ],
   [
@@ -288,9 +324,195 @@ window.esdocSearchIndex = [
     "external"
   ],
   [
+    "src/component.js",
+    "file/src/Component.js.html",
+    "src/Component.js",
+    "file"
+  ],
+  [
+    "src/component.js~component#componentdidmount",
+    "class/src/Component.js~Component.html#instance-method-componentDidMount",
+    "src/Component.js~Component#componentDidMount",
+    "method"
+  ],
+  [
+    "src/component.js~component#componentdidunmount",
+    "class/src/Component.js~Component.html#instance-member-componentDidUnmount",
+    "src/Component.js~Component#componentDidUnmount",
+    "member"
+  ],
+  [
+    "src/component.js~component#constructor",
+    "class/src/Component.js~Component.html#instance-constructor-constructor",
+    "src/Component.js~Component#constructor",
+    "method"
+  ],
+  [
+    "src/component.js~component#eventstoreact",
+    "class/src/Component.js~Component.html#instance-method-eventsToReact",
+    "src/Component.js~Component#eventsToReact",
+    "method"
+  ],
+  [
+    "src/component.js~component#eventstosubscribe",
+    "class/src/Component.js~Component.html#instance-method-eventsToSubscribe",
+    "src/Component.js~Component#eventsToSubscribe",
+    "method"
+  ],
+  [
+    "src/component.js~component#mustrefresh",
+    "class/src/Component.js~Component.html#instance-method-mustRefresh",
+    "src/Component.js~Component#mustRefresh",
+    "method"
+  ],
+  [
+    "src/component.js~component#node",
+    "class/src/Component.js~Component.html#instance-member-node",
+    "src/Component.js~Component#node",
+    "member"
+  ],
+  [
+    "src/component.js~component#noderefhandler",
+    "class/src/Component.js~Component.html#instance-method-nodeRefHandler",
+    "src/Component.js~Component#nodeRefHandler",
+    "method"
+  ],
+  [
+    "src/component.js~component#otherref",
+    "class/src/Component.js~Component.html#instance-member-otherRef",
+    "src/Component.js~Component#otherRef",
+    "member"
+  ],
+  [
+    "src/component.js~component#props",
+    "class/src/Component.js~Component.html#instance-member-props",
+    "src/Component.js~Component#props",
+    "member"
+  ],
+  [
+    "src/component.js~component#react",
+    "class/src/Component.js~Component.html#instance-method-react",
+    "src/Component.js~Component#react",
+    "method"
+  ],
+  [
+    "src/component.js~component#reacttochangestate",
+    "class/src/Component.js~Component.html#instance-method-reactToChangeState",
+    "src/Component.js~Component#reactToChangeState",
+    "method"
+  ],
+  [
+    "src/component.js~component#refresh",
+    "class/src/Component.js~Component.html#instance-method-refresh",
+    "src/Component.js~Component#refresh",
+    "method"
+  ],
+  [
+    "src/component.js~component#render",
+    "class/src/Component.js~Component.html#instance-method-render",
+    "src/Component.js~Component#render",
+    "method"
+  ],
+  [
+    "src/component.js~component#rendercomponent",
+    "class/src/Component.js~Component.html#instance-method-renderComponent",
+    "src/Component.js~Component#renderComponent",
+    "method"
+  ],
+  [
+    "src/component.js~component#state",
+    "class/src/Component.js~Component.html#instance-get-state",
+    "src/Component.js~Component#state",
+    "member"
+  ],
+  [
+    "src/component.js~component#store",
+    "class/src/Component.js~Component.html#instance-member-store",
+    "src/Component.js~Component#store",
+    "member"
+  ],
+  [
+    "src/component.js~component.iscomponent",
+    "class/src/Component.js~Component.html#static-member-isComponent",
+    "src/Component.js~Component.isComponent",
+    "member"
+  ],
+  [
+    "src/store.js",
+    "file/src/Store.js.html",
+    "src/Store.js",
+    "file"
+  ],
+  [
+    "src/store.js~store#componentssubscribes",
+    "class/src/Store.js~Store.html#instance-member-componentsSubscribes",
+    "src/Store.js~Store#componentsSubscribes",
+    "member"
+  ],
+  [
+    "src/store.js~store#componentstounmount",
+    "class/src/Store.js~Store.html#instance-member-componentsToUnmount",
+    "src/Store.js~Store#componentsToUnmount",
+    "member"
+  ],
+  [
+    "src/store.js~store#constructor",
+    "class/src/Store.js~Store.html#instance-constructor-constructor",
+    "src/Store.js~Store#constructor",
+    "method"
+  ],
+  [
+    "src/store.js~store#state",
+    "class/src/Store.js~Store.html#instance-member-state",
+    "src/Store.js~Store#state",
+    "member"
+  ],
+  [
+    "src/store.js~store#subscribe",
+    "class/src/Store.js~Store.html#instance-method-subscribe",
+    "src/Store.js~Store#subscribe",
+    "method"
+  ],
+  [
+    "src/store.js~store#subscribers",
+    "class/src/Store.js~Store.html#instance-member-subscribers",
+    "src/Store.js~Store#subscribers",
+    "member"
+  ],
+  [
+    "src/store.js~store#unsubscribeall",
+    "class/src/Store.js~Store.html#instance-method-unsubscribeAll",
+    "src/Store.js~Store#unsubscribeAll",
+    "method"
+  ],
+  [
+    "src/store.js~store#unsubscribebyeventandid",
+    "class/src/Store.js~Store.html#instance-method-unsubscribeByEventAndId",
+    "src/Store.js~Store#unsubscribeByEventAndId",
+    "method"
+  ],
+  [
+    "src/store.js~store#unsubsribe",
+    "class/src/Store.js~Store.html#instance-method-unsubsribe",
+    "src/Store.js~Store#unsubsribe",
+    "method"
+  ],
+  [
+    "src/store.js~store#updatestate",
+    "class/src/Store.js~Store.html#instance-method-updateState",
+    "src/Store.js~Store#updateState",
+    "method"
+  ],
+  [
     "src/main.js",
     "file/src/main.js.html",
     "src/main.js",
+    "file"
+  ],
+  [
+    "src/renderer.js",
+    "file/src/renderer.js.html",
+    "src/renderer.js",
     "file"
   ]
 ]
