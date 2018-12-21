@@ -1,10 +1,17 @@
 {
   "source": "./src",
   "destination": "./esdoc",
-  "title": "SimpleDom-component",
   "index": "./DOC.md",
   "excludes": ["util\\.js", "converter\\.js"],
   "plugins": [
+    {
+      "name": "esdoc-standard-plugin",
+      "option": {
+        "brand": {
+          "title": "SimpleDom-component"
+        }
+      }
+    },
     {
       "name": "esdoc-importpath-plugin",
       "option": {
@@ -12,13 +19,12 @@
         "replaces": [
           {
             "from": "^.*",
-            "to": "dist/simpledom-component.js"
+            "to": ""
           }
         ]
       }
     },
-    {
-      "name": "esdoc-es7-plugin"
-    }
+
+    {"name": "esdoc-ecmascript-proposal-plugin", "option": {"all": true}}
   ]
 }

@@ -21,19 +21,32 @@ describe('Store API', () => {
 
         let eventCounter = 0;
         let allCounter = 0;
+        let lastEvent = '';
 
         store.subscribe('event', () => eventCounter++);
-        store.subscribe('*', () => allCounter++);
+        store.subscribe('*', (event) => {
+            lastEvent = event;
+            allCounter++;
+        });
 
         store.updateState({}, 'otherEvent');
 
         expect(allCounter).to.be.equal(1);
         expect(eventCounter).to.be.equal(0);
+        expect(lastEvent).to.be.equal('otherEvent');
 
         store.updateState({}, 'event');
 
         expect(allCounter).to.be.equal(2);
         expect(eventCounter).to.be.equal(1);
+        expect(lastEvent).to.be.equal('event');
+
+
+        store.updateState({}, 'event', 'otherEvent');
+        
+        expect(allCounter).to.be.equal(3);
+        expect(eventCounter).to.be.equal(2);
+        expect('' + lastEvent).to.be.equal('event,otherEvent');
 
     });
 });
@@ -412,6 +425,53 @@ describe('SimpleDom component API', () => {
         store.updateState({counter: 2}, 'EVENT2');
 
         expect(document.getElementById('container').innerHTML).to.be.equal('<div>2</div>');
+
+    });
+
+
+
+    it('Test with multiple component inside component and refresh after update state on parent', () => {
+
+        class ComponentButton extends SimpleDom.Component {
+            eventsToSubscribe() {
+                return ['EVENT2'];
+            }
+
+            render() {
+                return <button onClick={() => {
+                    this.store.updateState({counter: this.state.counter+1}, 'EVENT');
+                    this.refresh();
+                }}>{this.state.counter}</button>;
+            }
+        }
+
+        class ComponentParent extends SimpleDom.Component {
+            eventsToSubscribe() {
+                return ['EVENT'];
+            }
+
+            render() {
+                return <ComponentButton/>;
+            }
+        }
+
+        cleanContainer();
+        const store = new SimpleDom.Store({counter: 0});
+        SimpleDom.renderToDom('container', <ComponentParent/>, store);
+
+        expect(document.getElementById('container').innerHTML).to.be.equal('<button>0</button>');
+
+        document.getElementById('container').querySelector("button").click();
+
+        expect(document.getElementById('container').innerHTML).to.be.equal('<button>1</button>');
+
+        document.getElementById('container').querySelector("button").click();
+
+        expect(document.getElementById('container').innerHTML).to.be.equal('<button>2</button>');
+
+        document.getElementById('container').querySelector("button").click();
+
+        expect(document.getElementById('container').innerHTML).to.be.equal('<button>3</button>');
 
     });
 

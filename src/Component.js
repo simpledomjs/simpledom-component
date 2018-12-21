@@ -85,14 +85,17 @@ export class Component {
     refresh() {
         const componentList = [];
         const oldNode = this.node;
+        if (!oldNode) {
+            console.warn("It's you've done double refresh on same component, please don't do this", new Error());
+        }
         this.node = null;
         let newNode = convertToNode(this.renderComponent(), this.store, componentList);
         if (newNode === undefined || newNode === null) {
-            oldNode.parentNode.removeChild(oldNode);
+            oldNode && oldNode.parentNode && oldNode.parentNode.removeChild(oldNode);
             this.componentDidMount();
             return;
         }
-        oldNode.parentNode.replaceChild(newNode, oldNode);
+        oldNode && oldNode.parentNode && oldNode.parentNode.replaceChild(newNode, oldNode);
         this.store.refreshComponentsToObserve && this.store.refreshComponentsToObserve();
 
         this.componentDidMount();

@@ -1,8 +1,10 @@
 {
-	presets: ['stage-0', 'es2015'],
+	presets: [
+		["@babel/preset-env", {
+			"debug":true
+		}], "@babel/preset-react"],
 	plugins: [
-		["transform-react-jsx", { "pragma": "SimpleDom.el" }],
-		"babel-plugin-add-module-exports",
-		"transform-class-properties"
+		["@babel/transform-react-jsx", { "pragma": "SimpleDom.el" }],
+		'@babel/plugin-proposal-class-properties'
 	]
 }
