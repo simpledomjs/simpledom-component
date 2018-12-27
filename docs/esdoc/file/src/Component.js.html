@@ -132,7 +132,7 @@ export class Component {
             console.warn(&quot;It&apos;s you&apos;ve done double refresh on same component, please don&apos;t do this&quot;, new Error());
         }
         this.node = null;
-        let newNode = convertToNode(this.renderComponent(), this.store, componentList);
+        let newNode = convertToNode(this.renderComponent(this.otherRef), this.store, componentList);
         if (newNode === undefined || newNode === null) {
             oldNode &amp;&amp; oldNode.parentNode &amp;&amp; oldNode.parentNode.removeChild(oldNode);
             this.componentDidMount();
