@@ -60,6 +60,8 @@ export class Component {
         if (this.componentDidUnmount) {
             this.store.componentsToUnmount.push(this);
         }
+
+        this.props.ref && this.props.ref(this);
     }
 
 
