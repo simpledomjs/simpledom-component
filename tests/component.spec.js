@@ -527,4 +527,38 @@ describe('SimpleDom component API', () => {
     })
 
 
+
+    class FocusableComponent extends SimpleDom.Component {
+        focus() {
+            this.input.focus();
+        }
+        render() {
+            return (
+                <input id="focusableComponentInput" ref={(ref) => this.input = ref}/>
+            );
+        }
+    }
+
+    class AppFocusableComponent extends SimpleDom.Component {
+        render() {
+            return  <div>
+                <FocusableComponent ref={(ref) => this.focusableComp = ref}/>
+                <button id="focus-button" onClick={() => this.focusableComp.focus()}>Put Focus</button>
+            </div>
+        }
+    }
+
+    it('Reference a component and call it\'s function', () => {
+        cleanContainer();
+
+        SimpleDom.renderToDom(
+            'container',
+           <AppFocusableComponent/>
+        );
+
+        document.getElementById('focus-button').click();
+        expect(document.activeElement).to.be.equal(document.getElementById('focusableComponentInput'));
+
+    })
+
 });
